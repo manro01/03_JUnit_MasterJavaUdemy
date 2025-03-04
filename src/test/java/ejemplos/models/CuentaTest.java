@@ -10,6 +10,9 @@
  * la clase prueba (en lugar de un solo método), los métodos de prueba se van a 
  *  ejecutar en el orden que el motor de JUnit elija, no es por orden de aparición
  *  o por orden alfabético, es como Junit decida.
+ *      Mucha ATENCIÓN esto solo afecta a los métodos, si un método tiene varias
+        pruebas (asserts) y una falla, finaliza la ejecución del método que lo 
+        contenga. A menos que se agrupen las assertion (con Assertions.assertAll).
  * 
  * Es la clase de prueba, en el caso del maestro, le dio las opciones para 
  *  generar varios métodos, en este caso, no se si no supe como hacerlo pero
@@ -38,6 +41,7 @@
  */
 package ejemplos.models;
 
+import ejemplos.exceptions.DineroInsuficienteException;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -135,5 +139,179 @@ class CuentaTest
         Assertions.assertEquals("1100.12345", cuenta.getSaldo().toPlainString()); //se va revisar que sea igual, pero con String en lugar de int
     }
     
+    /**
+     * En este test se van a probar dos cosas.
+     * Primero es que salte una excepción cuando se quiere usar el método debito 
+     *  porque no hay fondos suficientes. (SI salta la excepción, esta
+     *  prueba esta CORRECTA, si NO salta la excepció esta prueba esta MAL) e incluso que 
+     *  la excepción sea del mismo tipo, aquí definimos que la exepción es del 
+     *  tipo DineroInsuficienteException.class, si recibimos una de otro tipo por 
+     *  ejemplo NullPointerexcepction tambien falla este test
+     * Segundo es que el mensaje de excepción que sale se igual al que esperamos
+     *  que salga (que definimos aquí) 
+     */
+    @Test
+    void testDineroInsuficienteException()
+    {
+        //NOTA: recuera que tal como esta el ejemplo, para que pase este test tiene que saltar
+        //  la excepción de que la cuenta no tiene el saldo suficiente para hacer la transacción
+        //  Si la transacción se hace con exito, este test falla.
+        Cuenta cuenta= new Cuenta("Andres", new BigDecimal("1000.12345"));
+        
+        Exception exception= Assertions.assertThrows(DineroInsuficienteException.class, ()->{
+            cuenta.debito(new BigDecimal(15000));
+            //Se guarda el tipo de error que regresa assertionThrows
+        });
+        
+        String actual= exception.getMessage();
+        String esperado= "Dinero Insuficiente";
+        Assertions.assertEquals(esperado, actual);
+    }
     
+    @Test
+    void testTransferirDineroCuentas()
+    {
+        Cuenta cuenta1 = new Cuenta("Jhon Doe", new BigDecimal("2500"));
+        Cuenta cuenta2= new Cuenta("Andres", new BigDecimal("1500.8989"));
+        
+        Banco banco= new Banco();
+        banco.setNombre("Bital");
+        banco.transferir(cuenta2, cuenta1, new BigDecimal(500));
+        
+        Assertions.assertEquals("1000.8989", cuenta2.getSaldo().toPlainString());
+        Assertions.assertEquals("3000", cuenta1.getSaldo().toPlainString());
+    }
+    
+    /**
+     * Aquí se van a probar tres cosas
+     * 1. Que el banco tenga cuentas relacionadas
+     * 2. Que las cuentas tengan el banco relacionado
+     * 3. Que la relación de una persona(Cuenta.persona) este
+     *      ecista en el banco, es decir no solo que el banco
+     *      este relacionado sino que los datos de una cuenta 
+     *      esten bien relacionados en un banco.
+     */
+    @Test
+    void testRelacionBancoCuentas()
+    {
+        Cuenta cuenta1 = new Cuenta("Jhon Doe", new BigDecimal("2500"));
+        Cuenta cuenta2= new Cuenta("Andres", new BigDecimal("1500.8989"));
+        
+        Banco banco= new Banco();
+        banco.addCuenta(cuenta1);
+        banco.addCuenta(cuenta2);
+        
+        banco.setNombre("Bital");
+        
+        //Con esto vamos a probar que el banco tenga 2 cuentas relacionadas
+        Assertions.assertEquals(2, banco.getCuentas().size()); //probamos que banco tenga 2 cuentas relacionadas
+        
+        //COn esto vamos a probar que una cuenta este relacionado a un banco
+        Assertions.assertEquals("Bital", cuenta1.getBanco().getNombre());
+        //Tal como estaba el código esta prueba se fallaba, porque cuando se agrgaba una
+        //  cuenta al banco NO se agregaba el banco a la cuenta, por lo tanto teniamos
+        //  cuentas sin banco, pero Si teniamos Banco asociado con cuentas, 
+        //  Banco asociado cuenta1          cuenta1 banco asociado null
+        //                 cuenta2          cuenta2 banco asociado null
+        //Para arreglarlo se tuvo que agregar en Banco.addCuenta(Cuenta cuenta)
+        //  una linea para agregar el banco a la cuenta, quedando así
+        //
+        //public void addCuenta(Cuenta cuenta)
+        //{
+        //      cuentas.add(cuenta);
+        //      cuenta.setBanco(this); //Con esto a cada cuenta le asociamos este banco
+        //}
+        //Con esto ya funciona bien
+        //
+        //Este es precisamente un buen ejemplo de las pruebas unitarias, como 
+        //  se aprecia, parecia que esta bien el programa pues un Banco tenia bien
+        //  sus referencias a cuentas, pero cuando se provo al reves (que una cuenta
+        //  estuviera asociada a un banco) fue que dio error, ya con eso trabjamos
+        //  en contrarrestar el error.
+        
+        
+        //Con esto vamos a probar si dentro de las cuentas del banco tenemos la cuenta de [Andres]
+        Assertions.assertEquals("Andres", banco.getCuentas()
+                                                            .stream()
+                                                            .filter(c -> c.getPersona()
+                                                            .equals("Andres"))
+                                                            .findFirst()
+                                                            .get()
+                                                            .getPersona());
+        
+        //prueba casi lo mismo que el anterior pero ahora prueba si la cuenta de [Andres] esta presente
+//        Assertions.assertTrue(banco.getCuentas()
+//                                   .stream()
+//                                   .filter(c -> c.getPersona()
+//                                   .equals("Andres"))
+//                                   .findFirst()
+//                                   .isPresent());
+        
+        //prueba lo mismo que el anterior pero de otra forma
+        Assertions.assertTrue(banco.getCuentas()
+                                   .stream()
+                                   .anyMatch(c -> c.getPersona()
+                                   .equals("Andres")));
+    }
+    
+    /**
+     * Aquí se van a probar las assertion agrupadas, Recuera que si no estan agrupadas
+     *  assertions que estan dentro de un método y una falla, se termina la pruba
+     *  y no se especifica si las otras fallaron, para eso hay que agruparlas.
+     * NOTA. Este ejemplo esta basado en el método testRelacionBancoCuentas(),
+     * porlo que aquí se borraron los comentarios, si hay dudas revisar el 
+     * testRelacionBancoCuentas().
+     * 
+     * El objetivo es tener varios assertions agrupados para ver que pasa si uno
+     *  de ellos falla
+     * 
+     * NOTA MUY MUY IMPORTANTE: El objetivo se cumplio, si se ven los errores
+     *  pero en este caso pusimos 2 errores de true false, cuando cualquiera
+     *  de ellos falla solo dice que se esperaba un valor true pero se encontro un false
+     *  por lo que va  aser dificíl encontrar el errror, pero con los otros
+     *  assert (son equals) si funciona bien pues muestra que el error esta en el 
+     *  valor obtenido y el valor que se espera, por lo que es facíl encontrar el 
+     *  error.
+     */
+    @Test
+    void testAssertionsAgrupadas()
+    {
+        Cuenta cuenta1 = new Cuenta("Jhon Doe", new BigDecimal("2500"));
+        Cuenta cuenta2= new Cuenta("Andres", new BigDecimal("1500.8989"));
+        
+        Banco banco= new Banco();
+        banco.setNombre("Bital");
+        
+        banco.addCuenta(cuenta1);
+        banco.addCuenta(cuenta2);
+        
+        Assertions.assertAll( 
+                () -> {//Con esto vamos a probar que el banco tenga 2 cuentas relacionadas
+                        Assertions.assertEquals(2, banco.getCuentas().size()); }, 
+                () -> {//Con esto vamos a probar que una cuenta este relacionado a un banco
+                        Assertions.assertEquals("Bital", cuenta1.getBanco().getNombre());}, 
+                () -> {//Con esto vamos a probar si dentro de las cuentas del banco tenemos la cuenta de [Andres]
+                        Assertions.assertEquals("Andres", banco.getCuentas()
+                                                            .stream()
+                                                            .filter(c -> c.getPersona()
+                                                            .equals("Andres"))
+                                                            .findFirst()
+                                                            .get()
+                                                            .getPersona());},
+                () -> {//prueba casi lo mismo que el anterior pero ahora prueba si la cuenta de [Andres] esta presente
+                        Assertions.assertTrue(banco.getCuentas()
+                                                            .stream()
+                                                            .filter(c -> c.getPersona()
+                                                            .equals("Andres"))
+                                                            .findFirst()
+                                                            .isPresent());},
+                () -> {//prueba lo mismo que el anterior pero de otra forma
+                        Assertions.assertTrue(banco.getCuentas()
+                                                            .stream()
+                                                            .anyMatch(c -> c.getPersona()
+                                                            .equals("Andres")));}
+                );
+
+        
+    }
 }

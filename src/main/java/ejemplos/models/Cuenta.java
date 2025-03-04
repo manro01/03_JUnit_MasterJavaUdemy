@@ -3,6 +3,7 @@
  */
 package ejemplos.models;
 
+import ejemplos.exceptions.DineroInsuficienteException;
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -10,6 +11,8 @@ public class Cuenta
 {
     private String persona;
     private BigDecimal saldo;
+    
+    private Banco banco;
 
     public String getPersona()
     {
@@ -38,11 +41,34 @@ public class Cuenta
     {
         this.saldo = saldo;
     }
+
+    public Banco getBanco()
+    {
+        return banco;
+    }
+
+    public void setBanco(Banco banco)
+    {
+        this.banco = banco;
+    }
+    
+    
     
     public void debito(BigDecimal monto)
     {
         //this.saldo.subtract(monto); //aunque parece lógico esto NO ES CORRECTO porque BigDecimal es inmutable
-        this.saldo= this.saldo.subtract(monto);
+        //this.saldo= this.saldo.subtract(monto); //esto es correcto hay que guardar el resultado ya sea en otra o en la misma variable
+        
+        //Se comentao la sentencia anterior, porque se alargo el método y ya no cumplia bien la función
+        BigDecimal nuevoSaldo= this.saldo.subtract(monto);
+        
+        if(nuevoSaldo.compareTo(BigDecimal.ZERO)<0) //si esto se cumple el nuevo saldo es menor que cero y por lo tanto no se puede hacer la transacción
+        {
+            throw new DineroInsuficienteException("Dinero Insuficiente"); 
+            //NOTA: este mensaje tiene que ser el mismo que se coloco en CuentaTest.testDineroInsuficienteException() para poder
+            //  comparar si es el valor deseado
+        }
+        this.saldo= nuevoSaldo; //Si no hay problema el nuevoSaldo se guarda en el saldo
     }
     
     public void credito(BigDecimal monto)
