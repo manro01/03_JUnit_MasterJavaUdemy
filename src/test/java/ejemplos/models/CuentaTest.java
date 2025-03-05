@@ -1,7 +1,7 @@
 /*
  * Lo que se prueba con las JUnit son un valor esperado contra el valor obtenido.
  * Para ello jupiter(la parte de JUnit en la que se desarrolla el código) tiene
- * varios métodos Assertions que sirven para verificar resultados.
+ * varios métodos Assertions que sirven para verificar resultados. 
  *
  * NOTA MUY MUY IMPORTANTE: Los métodos de prueba deben ser independientes entre si,
  * NO DEBEN estar relacionados con otros métodos de la clase prueba.
@@ -11,14 +11,9 @@
  *  ejecutar en el orden que el motor de JUnit elija, no es por orden de aparición
  *  o por orden alfabético, es como Junit decida.
  *      Mucha ATENCIÓN esto solo afecta a los métodos, si un método tiene varias
-        pruebas (asserts) y una falla, finaliza la ejecución del método que lo 
-        contenga. A menos que se agrupen las assertion (con Assertions.assertAll).
- * 
- * Es la clase de prueba, en el caso del maestro, le dio las opciones para 
- *  generar varios métodos, en este caso, no se si no supe como hacerlo pero
- *  me genero muchos métodos por defautl, así que los borre todos para hacerlo manual
- *  como el maestro.
- *  NOTA: La diferencia es que el maestro usa intelliJ
+ *      pruebas (asserts) y una falla, finaliza la ejecución del método que lo 
+ *      contenga. A menos que se agrupen las assertion (con Assertions.assertAll).
+ *
  * 
  * NOTA: La clase no tiene el modificador public, esto es porque las clases 
  * de pruebas por conveniencia no deben ser publicas, pues como son de pruebas
@@ -36,6 +31,12 @@
  * 
  * NOTA MUY IMPORTANTE: Recuerda que las prubeas son comparar un valor deseado
  *  contra el valor que se obtiene;
+ *
+ * Es la clase de prueba, en el caso del maestro, le dio las opciones para 
+ *  generar varios métodos, en este caso, no se si no supe como hacerlo pero
+ *  me genero muchos métodos por defautl, así que los borre todos para hacerlo manual
+ *  como el maestro.
+ *  NOTA: La diferencia es que el maestro usa intelliJ
  * 
  * 
  */
@@ -43,12 +44,22 @@ package ejemplos.models;
 
 import ejemplos.exceptions.DineroInsuficienteException;
 import java.math.BigDecimal;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 
 class CuentaTest
 {
+    
+    Cuenta cuenta;
+    
+    /************************  TEST SIMPLES *************************************/
+    
     @Test ///Es para indicar que va a ser un métopo para las pruebas
     void testNombreCuenta()
     {
@@ -59,7 +70,11 @@ class CuentaTest
         //  que funcione el setPersona y otra prueba que el constructor este bien.
         // Dependiendo del programa y lo que se hace se puede tener uno, dos o más
         //  pruebas de este tipo.
-        Cuenta cuenta= new Cuenta("Andres", new BigDecimal("1000.12345"));  //se instancia un objeto de la clas a probar
+        
+
+        //Cuenta cuenta= new Cuenta("Andres", new BigDecimal("1000.12345"));  //se instancia un objeto de la clas a probar
+            //se va para el testAntesDeCada()
+        
         
         //cuenta.setPersona("Andres");  //esto es para probar que se le pede asignar le valor a la variable persona
         String esperado= "Andres";
@@ -72,8 +87,8 @@ class CuentaTest
     @Test
     void testSaldoCuenta()
     {
-        Cuenta cuenta= new Cuenta("Andres", new BigDecimal("1000.12345"));
-        
+        //cuenta= new Cuenta("Andres", new BigDecimal("1000.12345"));   //se va para el testAntesDeCada()
+         
         Assertions.assertEquals(1000.12345, cuenta.getSaldo().doubleValue());
         //lo que se va a hacer es probar que el valor de saldo sea iguarl a 1000.12345 pero en valor double
         //  es por queso que cuando se recupero el valor con getSaldo se convirtio a Double
@@ -102,12 +117,9 @@ class CuentaTest
     @Test
     void testIgualdadCuenta()
     {
-        Cuenta cuenta= new Cuenta("Jhon Doe", new BigDecimal("8900.997")); //valor real
+        cuenta= new Cuenta("Jhon Doe", new BigDecimal("8900.997")); //valor real
         Cuenta cuenta2= new Cuenta("Jhon Doe", new BigDecimal("8900.997")); //valor esperado
-        
-        System.out.println(cuenta);
-        System.out.println(cuenta2);
-        
+
         //Assertions.assertNotEquals(cuenta, cuenta2);
         Assertions.assertEquals(cuenta, cuenta2);
         //NORA MUY MUY IMPORTANTE:  assertEquals o assertNotEquals hacen uso de el método
@@ -122,7 +134,7 @@ class CuentaTest
     @Test
     void testDebitoCuenta()
     {
-        Cuenta cuenta = new Cuenta("Andres", new BigDecimal("1000.12345"));
+        //cuenta = new Cuenta("Andres", new BigDecimal("1000.12345"));  //se fue a testAntesDeCada()
         cuenta.debito(new BigDecimal(100));
         Assertions.assertNotNull(cuenta.getSaldo()); //primeo se verifica que el saldo de la cuenta no sea null (aunque esta revisión no sea explícita se hace en la linea de abajo pues no serían igual los valores)
         Assertions.assertEquals(900, cuenta.getSaldo().intValue()); //si a 1000.12345 le restamos 100 y lo hacemos int debe dar 900
@@ -132,7 +144,7 @@ class CuentaTest
     @Test
     void testCreditoCuenta()
     {
-        Cuenta cuenta = new Cuenta("Andres", new BigDecimal("1000.12345"));
+        //Cuenta cuenta = new Cuenta("Andres", new BigDecimal("1000.12345"));  //se fue a testAntesDeCada()
         cuenta.credito(new BigDecimal(100));
         Assertions.assertNotNull(cuenta.getSaldo()); //primeo se verifica que el saldo de la cuenta no sea null (aunque esta revisión no sea explícita se hace en la linea de abajo pues no serían igual los valores)
         Assertions.assertEquals(1100, cuenta.getSaldo().intValue()); //si a 1000.12345 le sumamos 100 y lo hacemos int debe dar 1100
@@ -156,7 +168,7 @@ class CuentaTest
         //NOTA: recuera que tal como esta el ejemplo, para que pase este test tiene que saltar
         //  la excepción de que la cuenta no tiene el saldo suficiente para hacer la transacción
         //  Si la transacción se hace con exito, este test falla.
-        Cuenta cuenta= new Cuenta("Andres", new BigDecimal("1000.12345"));
+        //Cuenta cuenta= new Cuenta("Andres", new BigDecimal("1000.12345"));  //se fue a testAntesDeCada()
         
         Exception exception= Assertions.assertThrows(DineroInsuficienteException.class, ()->{
             cuenta.debito(new BigDecimal(15000));
@@ -254,6 +266,9 @@ class CuentaTest
                                    .equals("Andres")));
     }
     
+    
+/************************  TEST AGRUPADOS *************************************/
+    
     /**
      * Aquí se van a probar las assertion agrupadas, Recuera que si no estan agrupadas
      *  assertions que estan dentro de un método y una falla, se termina la pruba
@@ -312,6 +327,202 @@ class CuentaTest
                                                             .equals("Andres")));}
                 );
 
+    }
+    
+    
+/************************  TEST CON MENSAJES *************************************/
+    /**
+     * Se va a probar el mandar un mensaje de error en los asserts.
+     *  Para mostrar un mensaje de error personalizado, el mensaje se manda como 
+     *  parémetro del assert
+     * Este ejemplo viene de méodo testNombreCuenta de esta misma clase.
+     * 
+     * NOTA MUY MUY IMPORTANTE: EL mensaje de error, esta diseñado para que solo
+     *  se cargue cuando se presente el error, por lo tanto se lo declaramos
+     *  como un String directamente, estaríamos haciendo algo no recomendable, 
+     *  pues los String se cargan en memorio, lo mejor es, declarar alguna función
+     *  que entre cuando se produce el error.
+     */
+    @Test 
+    void testNombreCuentaConMensaje()
+    {
         
+        Cuenta cuenta= new Cuenta("Andres", new BigDecimal("1000.12345"));  
+        
+        String esperado= "Andres";
+        String real= cuenta.getPersona();
+        
+        Assertions.assertEquals(esperado, real, "El nombre de la cuenta no es el que se espera"); //manera no recomendada
+        Assertions.assertTrue(real.equals("Andres"), () -> "Nombre de cuenta esperada debe ser igual a la real"); //forma correcta con lambdas
+    }
+    
+    /**
+     * Seguimos probando los test con mensaje, en este caso vamos a mejorar
+     *  el test testAssertionsAgrupadas().
+     * Como vimos el test original (testAssertionsAgrupadas()) tenia un gran problema
+     *  pues como realizaba varias pruebas de true y otros de equals era difícil
+     *  encontrar el problema pues el mensaje por default solo señalaba que se encontro
+     *  un false en lugar de un true, pero no decía donde, ahora que ya se vio el 
+     *  concepto de mandar mensajes ya se puede especificar mejor donde viene el error.
+     * 
+     * NOTA: En este test, se puede tener varios errores pues se depende mucho
+     *  que los valores que dan error y los que estan en el mensaje son idependientes
+     *  pero representan lo mismo, por ejemplo el nombre del banco se pone, como
+     *  valor esperado y luego se pone como parte del menaje, esto sería mejor
+     *  si se usaran variable, pero no se si se pueda en el tema de test, poruqe
+     *  en los métodos si se puede y además así estaba el ejemplo.
+     * 
+     * NOTA MUY MUY IMPORTANTE: como apenas estoy comprendiendo las lambdas las puse de 
+     *  una manera que me fuera facíl entenderlas, pero no se pondrían así ya cuendo
+     *  se trabja, con esto me refiero a la identación, también esta el temas de
+     *  poner o no {} pero esto no es ningúna regla
+     * 
+     */
+    @Test
+    void testAssertionsAgrupadasConMensaje()
+    {
+        Cuenta cuenta1 = new Cuenta("Jhon Doe", new BigDecimal("2500"));
+        Cuenta cuenta2= new Cuenta("Andres", new BigDecimal("1500.8989"));
+        
+        Banco banco= new Banco();
+        banco.setNombre("Bital");
+        
+        banco.addCuenta(cuenta1);
+        banco.addCuenta(cuenta2);
+        
+        Assertions.assertAll( 
+                () -> {//Con esto vamos a probar que el banco tenga 2 cuentas relacionadas
+                        Assertions.assertEquals(
+                                            2, banco.getCuentas().size(), 
+                                                    ()->{
+                                                        //esta segunda lambda es para el mensaje
+                                                            return "Se esperaban 2 cuentas relacionadas al banco "
+                                                                + banco.getNombre() + " y solo se encontraon " 
+                                                                + banco.getCuentas().size();
+                                                        }
+                                                );   
+                      }, 
+                () -> {//Con esto vamos a probar que una cuenta este relacionado a un banco
+                        Assertions.assertEquals(
+                                            "Bital", cuenta1.getBanco().getNombre(), 
+                                                   ()->{ 
+                                                       //esta segunda lambda es para el mensaje
+                                                        return "La cuenta1 de " + cuenta1.getPersona() 
+                                                                + " NO esta relacionda al banco Bital, sino "
+                                                                + "al banco " + cuenta1.getBanco().getNombre();
+                                                       }
+                                                );
+                      }, 
+                () -> {//Con esto vamos a probar si dentro de las cuentas del banco tenemos la cuenta de [Andres]
+                        //NOTA si esto lo que revisa es que la cuenta que se espera y la que se obtuvo sean iguales
+                        // pero si si el stream no regresa ninguna cuenta (porque no encontro coincidencias) manda una
+                        //  excepciónque no esta cubierta por el mensaje, por lo tanto no sale el mensaje personalizado
+                        //  sino el de la excepción
+                        Assertions.assertEquals(
+                                            "Andres", banco.getCuentas() //en esta linea hacemos el test
+                                                            .stream()
+                                                            .filter(c -> c.getPersona()
+                                                            .equals("Andres")) //Esta es la linea que puede dar excepción
+                                                            .findFirst()
+                                                            .get()
+                                                            .getPersona(), 
+                                                    () -> {
+                                                            //esta segunda lamba es para el mensaje
+                                                            return "La cuenta de Andres no se encuentra en el banco ";
+                                                          }
+                                                );
+                      },
+                () -> {//prueba casi lo mismo que el anterior pero ahora prueba si la cuenta de [Andres] esta presente
+                        //Este método si revisa si la cuenta existe dentro del banco
+                        Assertions.assertTrue(
+                                            banco.getCuentas()
+                                                            .stream()
+                                                            .filter(c -> c.getPersona()
+                                                            .equals("Andres"))
+                                                            .findFirst()
+                                                            .isPresent(),
+                                                    ()->{ 
+                                                            //esta segunda lambda es para el mensaje
+                                                            return "La cuenta Andres no se encuntra en el banco " 
+                                                                    + banco.getNombre();
+                                                        }
+                                             );
+                      },
+                () -> //prueba lo mismo que el anterior pero de otra forma
+                        Assertions.assertTrue(
+                                            banco.getCuentas()
+                                                            .stream()
+                                                            .anyMatch(c -> c.getPersona()
+                                                            .equals("Andres")),
+                                                    ()-> "No existe esta cuenta en el banco " + banco.getNombre()
+                                                        //Esta segunda lamba es para el mensaje
+                                            )
+                      //Recuerda que si una lambda, sólo tiene un método y que es lo que va a regresas, NO es
+                      //    necesario poner las {}, estas son las mismas lambda que las de arriba pero ya aplicando
+                      //    esta regla, esto mejora la presentación, pero HACE lo mismo, se pusieron
+                      //    las otras formar para que se entendiera mejor, pero es los mismo
+                );
+    }
+    
+/************************  TEST ANOTACIONES *************************************/
+    
+    /**
+     * Las anotaciones son para usar algunas funciones, ya incluidas dentro de
+     *  jupiter.
+     * Vamos a usar de base del test testNombreCuenta().
+     * NOTA MUY MUY MUY IMPORTANTE: NO FUNCIONA EL DISPLAYNAME, puede ser la versión de
+     * java, o el IDE pero no me funciona
+     */
+    @Test
+    @DisplayName("Probando testAnotaciones")
+    @Disabled //deshabilita la prueba, es como si se la saltara
+    void testAnotaciones()
+    {
+        Assertions.fail(); ///****** fail fuerza que falle el test, no importa si la prueba esta bien, se fuerza su fallo.
+                            //**** fail no es una etiqueta, esun método
+        Cuenta cuenta= new Cuenta("Andres", new BigDecimal("1000.12345"));  //se instancia un objeto de la clas a probar
+        
+        String esperado= "Andres";
+        String real= cuenta.getPersona();
+        
+        Assertions.assertEquals(esperado, real);
+        Assertions.assertTrue(real.equals("Andres"));
+    }
+    
+    /**
+     * Queremos que este test se ejecute anted de cualquier otro, y por eso
+     *  le dejamos la creación de un objeto cuenta que va a ser común a varias 
+     *  pruebas, pero no en todas, en esos caso SI se inicializa cuenta en sus test
+     */
+    @Test
+    @BeforeEach //Esto se ejecuta antes de cada método
+    void testAntesDeCada()
+    {
+        System.out.println("Iniciando prueba");
+        this.cuenta= new Cuenta("Andres", new BigDecimal("1000.12345"));  //se instancia un objeto de la clas a probar
+    }
+    
+    @Test
+    @AfterEach
+    void testDespuesDeCada()
+    {
+        System.out.println("Finalizando prueba");
+        System.out.println("");
+    }
+    
+    /**
+     * El test que use la etiqueta @BeforeAll tiene que SER STATIC, esto es porque
+     *  se va a usar antes que cualquier otro test y esto implica que pudiera acceder
+     *  a recursos que se crean en otro test, si lo hacemos static nos aseguramos
+     *  que se ejecute primero y podemos iniciar los recursos requeridos.
+     */
+    @Test
+    @BeforeAll
+    static void antesQueTodo()
+    {
+        System.out.println("hola");
     }
 }
+
+
+
