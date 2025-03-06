@@ -1,36 +1,60 @@
-/*
- * Lo que se prueba con las JUnit son un valor esperado contra el valor obtenido.
- * Para ello jupiter(la parte de JUnit en la que se desarrolla el código) tiene
+/**
+ * Lo que se prueba con las JUnit son un valor esperado contra el valor obtenido
+ * Para ello jupiter (la parte de JUnit en la que se desarrolla el código) tiene
  * varios métodos Assertions que sirven para verificar resultados. 
  *
- * NOTA MUY MUY IMPORTANTE: Los métodos de prueba deben ser independientes entre si,
+ * Los métodos de prueba deben ser independientes entre si,
  * NO DEBEN estar relacionados con otros métodos de la clase prueba.
  * 
- * NOTA: Si en la clase prueba tenemos varios métodos de prueba y ejecutamos toda
- * la clase prueba (en lugar de un solo método), los métodos de prueba se van a 
+ * Si en la clase prueba tenemos varios test y ejecutamos toda
+ * la clase prueba (en lugar de un solo test), los test se van a 
  *  ejecutar en el orden que el motor de JUnit elija, no es por orden de aparición
- *  o por orden alfabético, es como Junit decida.
- *      Mucha ATENCIÓN esto solo afecta a los métodos, si un método tiene varias
- *      pruebas (asserts) y una falla, finaliza la ejecución del método que lo 
+ *  o por orden alfabético, es como JUnit decida.
+ *      Mucha ATENCIÓN esto solo afecta a los test, si un test esta formado por varias
+ *      pruebas (asserts) y una falla, finaliza la ejecución del test que lo 
  *      contenga. A menos que se agrupen las assertion (con Assertions.assertAll).
  *
- * 
- * NOTA: La clase no tiene el modificador public, esto es porque las clases 
- * de pruebas por conveniencia no deben ser publicas, pues como son de pruebas
+ * La clase no tiene el modificador public, esto es porque las clases 
+ * test por conveniencia no deben ser publicas, pues como son de pruebas
  * solo se usan con este fin, y al no tener modificardor se les pasa el modificador
  * DEFAULT que es el que da acceso al package
  * 
- * NOTA: Para el caso de pruebas algunos desarrolladores optan por no utlizar
- * la regla cammel_case para el nombre de los métodos, sino que utilizan los
+ * Para el caso de pruebas algunos desarrolladores optan por no utlizar
+ * la regla cammel_case para el nombre de los test, sino que utilizan los
  * guiones para separar las palabras, esto es porque en el reporte que se genera
- * al final, aparecen los nombres de los métodos y se busca mejorar su descripición
- * es decir en lugar de testNombreCuenta se usa test_Nombre_Cuenta, por en este
+ * al final, aparecen los nombres de los test y se busca mejorar su descripición
+ * es decir en lugar de testNombreCuenta se usa test_Nombre_Cuenta, pero en este
  * ejemplo se usa camel-case.
  *     Otra opción es usar la etiqueta @displayName pues permite tener un nombre
- * especifico para el reporte, por ahora no se va a usar esta opción.
+ * especifico para el reporte.
+ *
+ * En las pruebas unitarias SE DEBE evitar tener "estados" en las variables, es
+ * decir, que no se deben tener test que dependan que una variable contenga cierto
+ * valor, es decir que no se debería tener test que esperen que otro test modifique
+ * una varible para que pueda continuar, (por ejemplo no se debería tener un test
+ * que espere que antes se le haya cambiado el nombre al banco para realizar bien
+ * su comprobación) esto es principalmente porque los test NO se realizan en un 
+ * orden definido, pero también porque, el objetivo de los test unitarios es probar
+ * pedazos de código independientes. Aunque NO se recomienda hacer si se puede hacer.
+ * NOTA: Lo que si se puede hacer es tener una variable que se use en varios test
+ * pero en cada test que se use se tiene que inicializar para que no dependa de un 
+ * valor anterior,
+ * NOTA: Se pude ordenar la ejecución de los test con la etiqueta @Order pero NO
+ * SE RECOMIENDA en lo nás minímo.
  * 
- * NOTA MUY IMPORTANTE: Recuerda que las prubeas son comparar un valor deseado
- *  contra el valor que se obtiene;
+ * Los test condicioneales sirven para tener ciertas condiciones que se esperan 
+ * en un test, por ejemplo si es un sistema operativo especifico o si es una versión
+ * de java especifica.
+ * Recuera que las etiquetas de los condicionales, NO SON los test, son accesos
+ *   a los test, es decir si se cumple la condición se entra al test o no (en caso
+ *   que sea un disabled) pero ya adentro se hace un test, en caso de que adentro del
+ *   no exista un assert, siempre va a dar positivo el test
+ * 
+ * Test Condicionales de supocision, estos son como los condicionales normales
+ *  pero en estos se SUPONE algo y sirven para evitar anular el test (mientras  que
+ *  con los condicionales normales dan un error) esto es útil cuando el test no 
+ *  se puede realizar porque falla algo, por ejemplo si el servidor esta activo
+ *  se puede hacer el test, si no esta activo no tiene sentido que se haga.
  *
  * Es la clase de prueba, en el caso del maestro, le dio las opciones para 
  *  generar varios métodos, en este caso, no se si no supe como hacerlo pero
@@ -44,6 +68,8 @@ package ejemplos.models;
 
 import ejemplos.exceptions.DineroInsuficienteException;
 import java.math.BigDecimal;
+import java.util.Properties;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -51,11 +77,30 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance; //es oara el @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+import org.junit.jupiter.api.condition.DisabledOnJre;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
+import org.junit.jupiter.api.condition.EnabledOnJre;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.JRE;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.Assumptions;
 
 
+//@TestInstance(TestInstance.Lifecycle.PER_CLASS) 
+        //COn esto hacemos que solo exista una referencia de la clase, ESTO NO ES NADA RECOMENDABLE
+        //  pero se puede hacer, con esto ya no se necesita que los test @AfeterALL y @BeforeAll 
+        //  sean  static
 class CuentaTest
 {
+    String nombreCuenta= "Andres"; //esta variable la agregue yo, por lo tanto cuando se use
+    // es porque yo la integre al ejemplo, creo que no se debe usar porque es un valor
+    //  que se va a compartir entre varios test, pero como es el mismo igual y si es
+    // valido, con valido me refiero a si se debe usar en los test
     
+    //Este si lo puso el mestro y es correcto porque se inicializa para cada
+    // prueba en la que se usa con el test @BeforeAll
     Cuenta cuenta;
     
     /************************  TEST SIMPLES *************************************/
@@ -520,7 +565,132 @@ class CuentaTest
     @BeforeAll
     static void antesQueTodo()
     {
-        System.out.println("hola");
+        System.out.println("Inicializando todas las ruebas");
+    }
+    
+    /**
+     * El test que use la etiqueta @AfterAll tiene que SER STATIC, esto es porque
+     * siempre se va a ejecutar, despues de los otros test, y esto implica que pudiera acceder
+     *  a recursos que se crean en otro test, si lo hacemos static nos aseguramos
+     *  que se ejecute con los recutsos que necesita.
+     */
+    @Test
+    @AfterAll
+    static void despuesDeTodo()
+    {
+        System.out.println("Finalizando todas las pruebas");
+    }
+    
+/************************  TEST CONDICIONALES *************************************/
+//Recuera que las etiquetas de los condicionales, NO SON los test, son accesos
+//   a los test, es decir si se cumple la condición se entra al test o no (en caso
+//   que sea un disabled) pero ya adentro se hace un test, en caso de que adentro del
+//   no exista un assert, siempre va a dar positivo el test
+// En este caso en todos los test condicionales se puso el assert para comparar1
+//  que nombreCuenta sea igual al nombre asociado a la cuenta [ cuenta.getPersona() ]
+//  estas variable y los asserts los puse yo para ejemplificar, no se si el uso
+//  de la variable nombreCuenta este correcto para los test unitarios
+    
+    /**
+     * Esta prueba solo se habilita si se hace en un S.O. windows
+     */
+    @Test
+    @EnabledOnOs(OS.WINDOWS)
+    void testSoloWindows()
+    {
+        System.out.println("Esta prueba se realiza se activa si el S.O. es windows");
+        Assertions.assertEquals(nombreCuenta, cuenta.getPersona());
+    }
+    
+    /**
+     * Esta prueba solo se habilita si se hace en un S.O. Linux
+     */
+    @Test
+    @EnabledOnOs(OS.LINUX)
+    void testSololinux()
+    {
+        System.out.println("Esta prueba se realiza se activa si el S.O. es Linux");
+        Assertions.assertEquals(nombreCuenta, cuenta.getPersona());
+    }
+    
+    /**
+     * Esta prueba se deshabilita si se hace en un S.O. Windows o un S.O. Mac
+     * Para agrupar varias condicionales se hace como si fuera un arreglo
+     * {valor1, valor2, valor3, etc}
+     */
+    @Test
+    @DisabledOnOs({OS.WINDOWS, OS.MAC})
+    void testNoWindowsNoMac()
+    {
+        System.out.println("Esta prueba se desactiva si el S.O. es windows o mac");
+        Assertions.assertEquals(nombreCuenta, cuenta.getPersona());
+    }
+    
+    /**
+     * Esta prueba se habilita si se hace en en JVE 8
+     */
+    @Test
+    @EnabledOnJre(JRE.JAVA_8)
+    void testOnJava8()
+    {
+        System.out.println("Esta prueba se activa se activa si la JRE es la 8");
+        Assertions.assertEquals(nombreCuenta, cuenta.getPersona());
+    }
+    
+    /**
+     * Esta prueba se habilita si se hace en en JVE 11
+     */
+    @Test
+    @EnabledOnJre(JRE.JAVA_11)
+    void testOnJava11()
+    {
+        System.out.println("Esta prueba se activa se activa si la JRE es la 11");
+        Assertions.assertEquals(nombreCuenta, cuenta.getPersona());
+    }
+    
+    /**
+     * Esta prueba se habilita si la valor de la propiedad user.lenguege
+     * coincide con es
+     */
+    @Test
+    @EnabledIfSystemProperty(named = "user.language", matches = "es")
+    void testOnPropertiUserLanguage()
+    {
+        System.out.println("Esta prueba se activa se activa si la properti user.language = es");
+        Assertions.assertEquals(nombreCuenta, cuenta.getPersona());
+    }
+    
+    /**
+     * No es un test como tal, solo es para mostrar las properties que tiene java
+     */
+    @BeforeAll
+    @Test
+    static void showProperties()
+    {
+        Properties properties= System.getProperties();
+        properties.forEach((k, v)-> System.out.println(k + ":" + v));
+    }
+    
+/************************  TEST CONDICIONALES ASSUMPTION (SUPOSICIONES)*************************************/
+//Recuera que las etiquetas de los condicionales, NO SON los test, son accesos
+//   a los test, es decir si se cumple la condición se entra al test o no (en caso
+//   que sea un disabled) pero ya adentro se hace un test, en caso de que adentro del
+//   no exista un assert, siempre va a dar positivo el test
+// En este caso en todos los test condicionales se puso el assert para comparar1
+//  que nombreCuenta sea igual al nombre asociado a la cuenta [ cuenta.getPersona() ]
+//  estas variable y los asserts los puse yo para ejemplificar, no se si el uso
+//  de la variable nombreCuenta este correcto para los test unitarios
+    
+    
+    @Test
+    void testSaldoCuenta()
+    {
+
+        Assertions.assertEquals(1000.12345, cuenta.getSaldo().doubleValue());
+        
+        //COMPARAR si valor de saldo de cuenta sea negativo
+        Assertions.assertFalse(cuenta.getSaldo().compareTo(BigDecimal.ZERO) <0);
+        terminar esto
     }
 }
 
