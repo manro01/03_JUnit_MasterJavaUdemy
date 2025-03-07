@@ -50,11 +50,21 @@
  *   que sea un disabled) pero ya adentro se hace un test, en caso de que adentro del
  *   no exista un assert, siempre va a dar positivo el test
  * 
- * Test Condicionales de supocision, estos son como los condicionales normales
+ * Test Assumptions (de supocision) estos son como los condicionales normales
  *  pero en estos se SUPONE algo y sirven para evitar anular el test (mientras  que
  *  con los condicionales normales dan un error) esto es útil cuando el test no 
  *  se puede realizar porque falla algo, por ejemplo si el servidor esta activo
  *  se puede hacer el test, si no esta activo no tiene sentido que se haga.
+ *  Los condicionales son etiquetas, y si no se sumple la condicíon, no entra
+ *  en el test, los Assumptions son pruebas dentro del código del test, por lo que
+ *  siempre entran y se van ejecutando hasta que se encuentra el assemption, si no 
+ *  lo pasan se salta lo que resta del test, si lo cumple se termina la ejecución.
+ * 
+ *      Dentro de los Assumptions estan los assumptions.assumingThat(boolean prueba, Executable executable)
+ *  donde prueba es un booleano, y executable es un objeto del tipo Executable por ejemplo una lambda
+ *  Si la prueba es [ true ] se procede con lo que esta en el executable (por ejempolo lambda) y despés se
+ *  continua con el resto del test, en caso de que la prueba sea [ false ], no se realiza lo del executable
+ *  (por ejemplo una lambda) pero si se hace el resto del test
  *
  * Es la clase de prueba, en el caso del maestro, le dio las opciones para 
  *  generar varios métodos, en este caso, no se si no supe como hacerlo pero
@@ -654,14 +664,14 @@ class CuentaTest
      */
     @Test
     @EnabledIfSystemProperty(named = "user.language", matches = "es")
-    void testOnPropertiUserLanguage()
+    void testOnPropertyUserLanguage()
     {
-        System.out.println("Esta prueba se activa se activa si la properti user.language = es");
+        System.out.println("Esta prueba se activa si la property user.language = es");
         Assertions.assertEquals(nombreCuenta, cuenta.getPersona());
     }
     
     /**
-     * No es un test como tal, solo es para mostrar las properties que tiene java
+     * No es un test como tal, solo es para mostrar las propertyes que tiene java
      */
     @BeforeAll
     @Test
@@ -671,27 +681,72 @@ class CuentaTest
         properties.forEach((k, v)-> System.out.println(k + ":" + v));
     }
     
-/************************  TEST CONDICIONALES ASSUMPTION (SUPOSICIONES)*************************************/
-//Recuera que las etiquetas de los condicionales, NO SON los test, son accesos
-//   a los test, es decir si se cumple la condición se entra al test o no (en caso
-//   que sea un disabled) pero ya adentro se hace un test, en caso de que adentro del
-//   no exista un assert, siempre va a dar positivo el test
-// En este caso en todos los test condicionales se puso el assert para comparar1
-//  que nombreCuenta sea igual al nombre asociado a la cuenta [ cuenta.getPersona() ]
-//  estas variable y los asserts los puse yo para ejemplificar, no se si el uso
-//  de la variable nombreCuenta este correcto para los test unitarios
+/************************  TEST ASSUMPTION (SUPOSICIONES)*************************************/
+//Los Assumptions son parecidos a los condicionales normales, la diferencia es que los
+//  assumptions NO SON etiquetas son comprobaciónes que se dan dentro del código del test
+//  que otra diferencia es que con las condicionales, no entraba al test con los Assumptions
+//  si entra al test e incluso se puede hacer cosas, hasta que se haga el Assumption
+//  es entonces que si no se cumple de salta el test, si se cumple continua el test.
     
-    
+    /**
+     * Si la propiedad del idioma es "en" entonces se termina el test, si no es "en
+     *  se salta el test
+     */
     @Test
-    void testSaldoCuenta()
+    void testLanguageEs()
     {
+        System.out.println("(assumption)Esta prueba se realizara solo si la property user.language = en");
+        
+        boolean verificacionIdioma= "en".equals(System.getProperty("user.language"));
 
+        Assumptions.assumeTrue(verificacionIdioma);
+        
+        Assertions.assertEquals(nombreCuenta, cuenta.getPersona());
+        
         Assertions.assertEquals(1000.12345, cuenta.getSaldo().doubleValue());
         
-        //COMPARAR si valor de saldo de cuenta sea negativo
-        Assertions.assertFalse(cuenta.getSaldo().compareTo(BigDecimal.ZERO) <0);
-        terminar esto
+        
     }
+    
+    /**
+     * Con las Assumption tenemos la prueba Assumptions.assumingThat(prueba, excutable) 
+     * donde prueba es lo que se va a comparar y executable es un método que sea del 
+     * tipo Executable como las lambdas, ver el ejemplo para más información 
+     * Este test permite que en caso de NO CUMPLIR la prueba lo demás del test 
+     * continua su ejecución saltandose lo que esta en el executable, en caso 
+     * de SI CUMPLIR con la condición se procede con el executbale, donde podemos
+     *  tener otras pruebas
+     */
+    @Test
+    void testAssumptionAssumingThat()
+    {
+        cuenta.setBanco(new Banco());
+        cuenta.getBanco().setNombre("Bital");
+        //establecimos el nombre del banco, esto es para la pruenba en caso de que se cumpla
+        //el lenguaje
+        
+        System.out.println("(assumingThat)Esta prueba se hara completa solo si la property user.language = en");
+        
+        boolean verificacionIdioma= "en".equals(System.getProperty("user.language"));
+
+        // Si el lennguage SI ES "en" se procede con lo que esta dentro
+        //  de la lambda y después se continua con el resto de este test. Pero
+        //  si el lenguage NO ES "en", entonces no se entra en la lambda y se sigue 
+        //  con el resto de este test, pero si el lenguage 
+        Assumptions.assumingThat(verificacionIdioma, ()->{
+            System.out.println("El lenguage es \"en\", por lo que se entro en la lambda");
+            Assertions.assertEquals("Bitall", cuenta.getBanco().getNombre());
+            //NOTA: esta prueba se va a fallar, porque el nombre del banco es Bital y 
+            //  y que se esta eperando aquí es Bittal por lo que lo esperado y lo real no
+            // coincide, esta hecho así para demostrar el error
+        });
+        
+        Assertions.assertEquals(nombreCuenta, cuenta.getPersona());
+        
+        Assertions.assertEquals(1000.12345, cuenta.getSaldo().doubleValue());
+        
+    }
+    
 }
 
 
