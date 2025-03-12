@@ -15,7 +15,7 @@ public class CuentaParaAnidadas
     private String persona;
     private BigDecimal saldo;
     
-    private Banco banco;
+    private BancoParaAnidadas banco;
 
     public String getPersona()
     {
@@ -45,12 +45,12 @@ public class CuentaParaAnidadas
         this.saldo = saldo;
     }
 
-    public Banco getBanco()
+    public BancoParaAnidadas getBanco()
     {
         return banco;
     }
 
-    public void setBanco(Banco banco)
+    public void setBanco(BancoParaAnidadas banco)
     {
         this.banco = banco;
     }
