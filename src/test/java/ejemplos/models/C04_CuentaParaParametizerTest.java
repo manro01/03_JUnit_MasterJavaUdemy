@@ -1,25 +1,5 @@
 /**
- * Esta clase de prueba es para probar las clases de prueba anidadas, hice esto 
- *  para no seguir modificando el CuentaTest, y tener lo que se vio ahi de respaldo.
- * 
- * Al igual que una clase normal las clases de test pueden tener clases anidadas, 
- * con el uso de estas podemos tener un orden sobre como se ejecutan las pruebas
- * además de que mejora la visibilidad.
- * 
- * Con la etiqueta @Nested podemos definie que las innerClass van a ser tratadas 
- * como si fueran metodos de test normales y por lo tanto responden a las etiquetas
- * @BeforeEach, @AfterEach, @ExtendWith 
- *      Sin embargo con @BeforaAll y @AfterAll hay una cuestion y es que unicamente
- *  las clases NO ESTATICAS pueden ser @Nested, pues como vimos en el ejemplo
- *  CuentaTest los métodos que declarabamos como @BeforeAll y @AfterAll se tenian
- *  que poner como ESTATICOS, aunque también vimos que una forma de darle la vuelta
- *  a esto era usar la etiqueta @TestInstance(Lifecycle.PER_CLASS) por lo que la tendremos
- *  que usar si queremos usar @BeforeAll y @AfterAll.
- * Otra solución es que los @BeforeAll y @AfterAll esten únicamente en la clase
- *  principal NO en las innerclass.
- * 
- * Casi todos los test que se hicieron aquí son repetidos de CuentaTest.java por
- * lo tanto si hay duads ve para allá
+ * Se va a ejemplificar el uso de test con parámetros
  */
 package ejemplos.models;
 
@@ -28,11 +8,23 @@ import java.math.BigDecimal;
 import java.util.Properties;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumingThat;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.RepetitionInfo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
@@ -41,11 +33,7 @@ import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.JRE;
 import org.junit.jupiter.api.condition.OS;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assumptions.*;
-
-
-public class CuentaParaAnidadasTest
+public class C04_CuentaParaParametizerTest
 {
     String nombreCuenta= "Andres"; //esta variable la agregue yo, por lo tanto cuando se use
     // es porque yo la integre al ejemplo, creo que no se debe usar porque es un valor
@@ -54,7 +42,7 @@ public class CuentaParaAnidadasTest
     
     //Este si lo puso el mestro y es correcto porque se inicializa para cada
     // prueba en la que se usa con el test @BeforeAll
-    CuentaParaAnidadas cuenta;
+    C04_CuentaParaParametizer cuenta;
     
     @Test
     @DisplayName("Probando testAnotaciones")
@@ -77,7 +65,7 @@ public class CuentaParaAnidadasTest
     void testAntesDeCada()
     {
         System.out.println("Iniciando prueba");
-        this.cuenta= new CuentaParaAnidadas("Andres", new BigDecimal("1000.12345"));  //se instancia un objeto de la clas a probar
+        this.cuenta= new C04_CuentaParaParametizer("Andres", new BigDecimal("1000.12345"));  //se instancia un objeto de la clas a probar
     }
     
     @Test
@@ -129,8 +117,8 @@ public class CuentaParaAnidadasTest
         @Test
         void testIgualdadCuenta()
         {
-            cuenta = new CuentaParaAnidadas("Jhon Doe", new BigDecimal("8900.997")); //valor real
-            CuentaParaAnidadas cuenta2 = new CuentaParaAnidadas("Jhon Doe", new BigDecimal("8900.997")); //valor esperado
+            cuenta = new C04_CuentaParaParametizer("Jhon Doe", new BigDecimal("8900.997")); //valor real
+            C04_CuentaParaParametizer cuenta2 = new C04_CuentaParaParametizer("Jhon Doe", new BigDecimal("8900.997")); //valor esperado
 
             assertEquals(cuenta, cuenta2);
         }
@@ -169,10 +157,10 @@ public class CuentaParaAnidadasTest
         @Test
         void testTransferirDineroCuentas()
         {
-            CuentaParaAnidadas cuenta1 = new CuentaParaAnidadas("Jhon Doe", new BigDecimal("2500"));
-            CuentaParaAnidadas cuenta2 = new CuentaParaAnidadas("Andres", new BigDecimal("1500.8989"));
+            C04_CuentaParaParametizer cuenta1 = new C04_CuentaParaParametizer("Jhon Doe", new BigDecimal("2500"));
+            C04_CuentaParaParametizer cuenta2 = new C04_CuentaParaParametizer("Andres", new BigDecimal("1500.8989"));
 
-            BancoParaAnidadas banco = new BancoParaAnidadas();
+            C04_BancoParaParametizer banco = new C04_BancoParaParametizer();
             banco.setNombre("Bital");
             banco.transferir(cuenta2, cuenta1, new BigDecimal(500));
 
@@ -183,10 +171,10 @@ public class CuentaParaAnidadasTest
         @Test
         void testRelacionBancoCuentas()
         {
-            CuentaParaAnidadas cuenta1 = new CuentaParaAnidadas("Jhon Doe", new BigDecimal("2500"));
-            CuentaParaAnidadas cuenta2 = new CuentaParaAnidadas("Andres", new BigDecimal("1500.8989"));
+            C04_CuentaParaParametizer cuenta1 = new C04_CuentaParaParametizer("Jhon Doe", new BigDecimal("2500"));
+            C04_CuentaParaParametizer cuenta2 = new C04_CuentaParaParametizer("Andres", new BigDecimal("1500.8989"));
 
-            BancoParaAnidadas banco = new BancoParaAnidadas();
+            C04_BancoParaParametizer banco = new C04_BancoParaParametizer();
             banco.addCuenta(cuenta1);
             banco.addCuenta(cuenta2);
 
@@ -220,10 +208,10 @@ public class CuentaParaAnidadasTest
         @Test
         void testAssertionsAgrupadas()
         {
-            CuentaParaAnidadas cuenta1 = new CuentaParaAnidadas("Jhon Doe", new BigDecimal("2500"));
-            CuentaParaAnidadas cuenta2 = new CuentaParaAnidadas("Andres", new BigDecimal("1500.8989"));
+            C04_CuentaParaParametizer cuenta1 = new C04_CuentaParaParametizer("Jhon Doe", new BigDecimal("2500"));
+            C04_CuentaParaParametizer cuenta2 = new C04_CuentaParaParametizer("Andres", new BigDecimal("1500.8989"));
 
-            BancoParaAnidadas banco = new BancoParaAnidadas();
+            C04_BancoParaParametizer banco = new C04_BancoParaParametizer();
             banco.setNombre("Bital");
 
             banco.addCuenta(cuenta1);
@@ -274,7 +262,7 @@ public class CuentaParaAnidadasTest
         void testNombreCuentaConMensaje()
         {
 
-            //cuenta= new CuentaParaAnidadas("Andres", new BigDecimal("1000.12345"));  
+            //cuenta= new C02_CuentaParaAnidadas("Andres", new BigDecimal("1000.12345"));  
             String esperado = "Andres";
             String real = cuenta.getPersona();
 
@@ -285,10 +273,10 @@ public class CuentaParaAnidadasTest
         @Test
         void testAssertionsAgrupadasConMensaje()
         {
-            CuentaParaAnidadas cuenta1 = new CuentaParaAnidadas("Jhon Doe", new BigDecimal("2500"));
-            CuentaParaAnidadas cuenta2 = new CuentaParaAnidadas("Andres", new BigDecimal("1500.8989"));
+            C04_CuentaParaParametizer cuenta1 = new C04_CuentaParaParametizer("Jhon Doe", new BigDecimal("2500"));
+            C04_CuentaParaParametizer cuenta2 = new C04_CuentaParaParametizer("Andres", new BigDecimal("1500.8989"));
 
-            BancoParaAnidadas banco = new BancoParaAnidadas();
+            C04_BancoParaParametizer banco = new C04_BancoParaParametizer();
             banco.setNombre("Bital");
 
             banco.addCuenta(cuenta1);
@@ -426,6 +414,51 @@ public class CuentaParaAnidadasTest
         }
     }
     
+    /************************  TEST REPETICIONES  *************************************/
+    @Nested
+    class RepetidasTest
+    {
+        /**
+         * Repeta FORZOSAMENTE lleva un parámetro que es el numero derepeticiones
+         * puede llevar otro (es optativo) con un mensaje para cada vez que se ejecute
+         *  una repetición.
+         *  si solamentes es el numero de repeticiones se puede poner solo el numero, 
+         *  pero su se pone otro parametro hay que poner value y name.
+         *  currentRepetition y totalRepetitions son variables de @RepeatedTest
+         * 
+         * NOTA IMPORTATNTE: El nombre de la repetición tampoco se muestra en netbeans hay que probar 
+         *  en el intelliJ
+         */
+        @RepeatedTest(value=5, name="Numero de repeticón {currentRepetition} de {totalRepetitions}")  //el parametro es el numero de veces que se va a repetir la prueba
+        void testRepeticion()
+        {
+            Assertions.assertTrue(cuenta != null);
+        }
+        
+        /**
+         * RepetitionInfo es una variable que contiene los valores currentRepetition y totalRepetitions
+         * que podemos pasar como parámetro del test (es una inyección de dependencias). 
+         * Podemos usar los datos de RepetitionInfo para poner condiciones para hacer 
+         * algo, se puede usar incluso un switch.
+         * @param info 
+         */
+        @RepeatedTest(5)
+        void testRpeticionesConInyeccion(RepetitionInfo info)
+        {
+            Assertions.assertFalse(cuenta == null);
+            if(info.getCurrentRepetition()==3)
+            {
+                System.out.println("repetición 3, en testRpeticionesConInyeccion");
+            }
+            
+        }
+    }
+    
+    
+    
+    
+    
+    
 /************************  TEST ASSUMPTION (SUPOSICIONES)*************************************/
     @Nested
     @DisplayName("Assumptions")
@@ -450,7 +483,7 @@ public class CuentaParaAnidadasTest
         @Test
         void testAssumptionAssumingThat()
         {
-            cuenta.setBanco(new BancoParaAnidadas());
+            cuenta.setBanco(new C04_BancoParaParametizer());
             cuenta.getBanco().setNombre("Bital");
             System.out.println("(assumingThat)Esta prueba se hara completa solo si la property user.language = en");
 
@@ -466,7 +499,6 @@ public class CuentaParaAnidadasTest
 
         }
     }
-
 
 }
 

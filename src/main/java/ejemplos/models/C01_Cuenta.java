@@ -1,8 +1,5 @@
 /**
- * Es lo mismo que Cuenta pero la vamos a usar para demostrar el uso
- * de clases de prueba anidadas, como implicaba modificar varias cosas
- * de la clase Cuenta y como el archivo de test ESTA LIGADO a su clase para 
- * probar por el nombre, decidi hacer esta otra para ejemplificar
+ * Representa una cuenta de banco simple
  */
 package ejemplos.models;
 
@@ -10,19 +7,19 @@ import ejemplos.exceptions.DineroInsuficienteException;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public class CuentaParaAnidadas
+public class C01_Cuenta
 {
     private String persona;
     private BigDecimal saldo;
     
-    private BancoParaAnidadas banco;
+    private C01_Banco banco;
 
     public String getPersona()
     {
         return persona;
     }
 
-    public CuentaParaAnidadas(String persona, BigDecimal saldo)
+    public C01_Cuenta(String persona, BigDecimal saldo)
     {
         this.saldo = saldo;
         this.persona= persona;
@@ -45,12 +42,12 @@ public class CuentaParaAnidadas
         this.saldo = saldo;
     }
 
-    public BancoParaAnidadas getBanco()
+    public C01_Banco getBanco()
     {
         return banco;
     }
 
-    public void setBanco(BancoParaAnidadas banco)
+    public void setBanco(C01_Banco banco)
     {
         this.banco = banco;
     }
@@ -93,7 +90,7 @@ public class CuentaParaAnidadas
         if (getClass() != obj.getClass()) { //revisa que los objetos sean de la misma clase
             return false;
         }
-        final CuentaParaAnidadas other = (CuentaParaAnidadas) obj; //crea un objeto nuevo con lo mandado por parámetro
+        final C01_Cuenta other = (C01_Cuenta) obj; //crea un objeto nuevo con lo mandado por parámetro
         if (!Objects.equals(this.persona, other.persona)) { //verifica si el valor persona es el mismo
             return false;
         }

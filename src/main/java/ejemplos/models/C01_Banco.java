@@ -7,12 +7,12 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Banco
+public class C01_Banco
 {
     private String nombre;
-    private List<Cuenta> cuentas;
+    private List<C01_Cuenta> cuentas;
     
-    public Banco()
+    public C01_Banco()
     {
         cuentas= new ArrayList<>();
     }
@@ -27,23 +27,23 @@ public class Banco
         this.nombre = nombre;
     }
 
-    public List<Cuenta> getCuentas()
+    public List<C01_Cuenta> getCuentas()
     {
         return cuentas;
     }
 
-    public void setCuentas(List<Cuenta> cuentas)
+    public void setCuentas(List<C01_Cuenta> cuentas)
     {
         this.cuentas = cuentas;
     }
     
-    public void addCuenta(Cuenta cuenta)
+    public void addCuenta(C01_Cuenta cuenta)
     {
         cuentas.add(cuenta);
         cuenta.setBanco(this); //Con esto a cada cuenta le asociamos este banco
     }
     
-    public void transferir(Cuenta origen, Cuenta destino, BigDecimal monto)
+    public void transferir(C01_Cuenta origen, C01_Cuenta destino, BigDecimal monto)
     {
         origen.debito(monto); //saca el dinero de la cuenta origen
         destino.credito(monto); //guarda el dinero en la cuenta destino

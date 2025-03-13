@@ -1,5 +1,6 @@
-/**
- * Representa una cuenta de banco simple
+/*
+ * Esta es la clase cuenta para probar las test parémetrizadas, 
+ * Es lo mismo que estaba en C03_CuentaParaRepetidas
  */
 package ejemplos.models;
 
@@ -7,19 +8,19 @@ import ejemplos.exceptions.DineroInsuficienteException;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public class Cuenta
+public class C04_CuentaParaParametizer
 {
     private String persona;
     private BigDecimal saldo;
     
-    private Banco banco;
+    private C04_BancoParaParametizer banco;
 
     public String getPersona()
     {
         return persona;
     }
 
-    public Cuenta(String persona, BigDecimal saldo)
+    public C04_CuentaParaParametizer(String persona, BigDecimal saldo)
     {
         this.saldo = saldo;
         this.persona= persona;
@@ -42,12 +43,12 @@ public class Cuenta
         this.saldo = saldo;
     }
 
-    public Banco getBanco()
+    public C04_BancoParaParametizer getBanco()
     {
         return banco;
     }
 
-    public void setBanco(Banco banco)
+    public void setBanco(C04_BancoParaParametizer banco)
     {
         this.banco = banco;
     }
@@ -90,7 +91,7 @@ public class Cuenta
         if (getClass() != obj.getClass()) { //revisa que los objetos sean de la misma clase
             return false;
         }
-        final Cuenta other = (Cuenta) obj; //crea un objeto nuevo con lo mandado por parámetro
+        final C04_CuentaParaParametizer other = (C04_CuentaParaParametizer) obj; //crea un objeto nuevo con lo mandado por parámetro
         if (!Objects.equals(this.persona, other.persona)) { //verifica si el valor persona es el mismo
             return false;
         }
@@ -104,3 +105,4 @@ public class Cuenta
     
     
 }
+

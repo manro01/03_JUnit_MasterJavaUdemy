@@ -102,7 +102,7 @@ import org.junit.jupiter.api.Assumptions;
         //COn esto hacemos que solo exista una referencia de la clase, ESTO NO ES NADA RECOMENDABLE
         //  pero se puede hacer, con esto ya no se necesita que los test @AfeterALL y @BeforeAll 
         //  sean  static
-class CuentaTest
+class C01_CuentaTest
 {
     String nombreCuenta= "Andres"; //esta variable la agregue yo, por lo tanto cuando se use
     // es porque yo la integre al ejemplo, creo que no se debe usar porque es un valor
@@ -111,7 +111,7 @@ class CuentaTest
     
     //Este si lo puso el mestro y es correcto porque se inicializa para cada
     // prueba en la que se usa con el test @BeforeAll
-    Cuenta cuenta;
+    C01_Cuenta cuenta;
     
     /************************  TEST SIMPLES *************************************/
     
@@ -127,7 +127,7 @@ class CuentaTest
         //  pruebas de este tipo.
         
 
-        //Cuenta cuenta= new Cuenta("Andres", new BigDecimal("1000.12345"));  //se instancia un objeto de la clas a probar
+        //Cuenta cuenta= new C01_Cuenta("Andres", new BigDecimal("1000.12345"));  //se instancia un objeto de la clas a probar
             //se va para el testAntesDeCada()
         
         
@@ -142,7 +142,7 @@ class CuentaTest
     @Test
     void testSaldoCuenta()
     {
-        //cuenta= new Cuenta("Andres", new BigDecimal("1000.12345"));   //se va para el testAntesDeCada()
+        //cuenta= new C01_Cuenta("Andres", new BigDecimal("1000.12345"));   //se va para el testAntesDeCada()
          
         Assertions.assertEquals(1000.12345, cuenta.getSaldo().doubleValue());
         //lo que se va a hacer es probar que el valor de saldo sea iguarl a 1000.12345 pero en valor double
@@ -172,8 +172,8 @@ class CuentaTest
     @Test
     void testIgualdadCuenta()
     {
-        cuenta= new Cuenta("Jhon Doe", new BigDecimal("8900.997")); //valor real
-        Cuenta cuenta2= new Cuenta("Jhon Doe", new BigDecimal("8900.997")); //valor esperado
+        cuenta= new C01_Cuenta("Jhon Doe", new BigDecimal("8900.997")); //valor real
+        C01_Cuenta cuenta2= new C01_Cuenta("Jhon Doe", new BigDecimal("8900.997")); //valor esperado
 
         //Assertions.assertNotEquals(cuenta, cuenta2);
         Assertions.assertEquals(cuenta, cuenta2);
@@ -182,14 +182,14 @@ class CuentaTest
         //  pero que podemos modificar para que compare lo que nosotros queremos 
         //  para saber si dos instancias son iguales, entonces si no se modifica el equals en el objeto
         //  va a comparar que las referencias sean iguales, pero si se modifica el equals
-        //  va a comparar lo que se definio, en este caso si se modifico la clase Cuenta
+        //  va a comparar lo que se definio, en este caso si se modifico la clase C01_Cuenta
         //  para que comparara los valores de persona y saldo
     }
     
     @Test
     void testDebitoCuenta()
     {
-        //cuenta = new Cuenta("Andres", new BigDecimal("1000.12345"));  //se fue a testAntesDeCada()
+        //cuenta = new C01_Cuenta("Andres", new BigDecimal("1000.12345"));  //se fue a testAntesDeCada()
         cuenta.debito(new BigDecimal(100));
         Assertions.assertNotNull(cuenta.getSaldo()); //primeo se verifica que el saldo de la cuenta no sea null (aunque esta revisión no sea explícita se hace en la linea de abajo pues no serían igual los valores)
         Assertions.assertEquals(900, cuenta.getSaldo().intValue()); //si a 1000.12345 le restamos 100 y lo hacemos int debe dar 900
@@ -199,7 +199,7 @@ class CuentaTest
     @Test
     void testCreditoCuenta()
     {
-        //Cuenta cuenta = new Cuenta("Andres", new BigDecimal("1000.12345"));  //se fue a testAntesDeCada()
+        //Cuenta cuenta = new C01_Cuenta("Andres", new BigDecimal("1000.12345"));  //se fue a testAntesDeCada()
         cuenta.credito(new BigDecimal(100));
         Assertions.assertNotNull(cuenta.getSaldo()); //primeo se verifica que el saldo de la cuenta no sea null (aunque esta revisión no sea explícita se hace en la linea de abajo pues no serían igual los valores)
         Assertions.assertEquals(1100, cuenta.getSaldo().intValue()); //si a 1000.12345 le sumamos 100 y lo hacemos int debe dar 1100
@@ -223,7 +223,7 @@ class CuentaTest
         //NOTA: recuera que tal como esta el ejemplo, para que pase este test tiene que saltar
         //  la excepción de que la cuenta no tiene el saldo suficiente para hacer la transacción
         //  Si la transacción se hace con exito, este test falla.
-        //Cuenta cuenta= new Cuenta("Andres", new BigDecimal("1000.12345"));  //se fue a testAntesDeCada()
+        //Cuenta cuenta= new C01_Cuenta("Andres", new BigDecimal("1000.12345"));  //se fue a testAntesDeCada()
         
         Exception exception= Assertions.assertThrows(DineroInsuficienteException.class, ()->{
             cuenta.debito(new BigDecimal(15000));
@@ -238,10 +238,10 @@ class CuentaTest
     @Test
     void testTransferirDineroCuentas()
     {
-        Cuenta cuenta1 = new Cuenta("Jhon Doe", new BigDecimal("2500"));
-        Cuenta cuenta2= new Cuenta("Andres", new BigDecimal("1500.8989"));
+        C01_Cuenta cuenta1 = new C01_Cuenta("Jhon Doe", new BigDecimal("2500"));
+        C01_Cuenta cuenta2= new C01_Cuenta("Andres", new BigDecimal("1500.8989"));
         
-        Banco banco= new Banco();
+        C01_Banco banco= new C01_Banco();
         banco.setNombre("Bital");
         banco.transferir(cuenta2, cuenta1, new BigDecimal(500));
         
@@ -261,10 +261,10 @@ class CuentaTest
     @Test
     void testRelacionBancoCuentas()
     {
-        Cuenta cuenta1 = new Cuenta("Jhon Doe", new BigDecimal("2500"));
-        Cuenta cuenta2= new Cuenta("Andres", new BigDecimal("1500.8989"));
+        C01_Cuenta cuenta1 = new C01_Cuenta("Jhon Doe", new BigDecimal("2500"));
+        C01_Cuenta cuenta2= new C01_Cuenta("Andres", new BigDecimal("1500.8989"));
         
-        Banco banco= new Banco();
+        C01_Banco banco= new C01_Banco();
         banco.addCuenta(cuenta1);
         banco.addCuenta(cuenta2);
         
@@ -277,13 +277,13 @@ class CuentaTest
         Assertions.assertEquals("Bital", cuenta1.getBanco().getNombre());
         //Tal como estaba el código esta prueba se fallaba, porque cuando se agrgaba una
         //  cuenta al banco NO se agregaba el banco a la cuenta, por lo tanto teniamos
-        //  cuentas sin banco, pero Si teniamos Banco asociado con cuentas, 
-        //  Banco asociado cuenta1          cuenta1 banco asociado null
+        //  cuentas sin banco, pero Si teniamos C01_Banco asociado con cuentas, 
+        //  C01_Banco asociado cuenta1          cuenta1 banco asociado null
         //                 cuenta2          cuenta2 banco asociado null
-        //Para arreglarlo se tuvo que agregar en Banco.addCuenta(Cuenta cuenta)
+        //Para arreglarlo se tuvo que agregar en C01_Banco.addCuenta(C01_Cuenta cuenta)
         //  una linea para agregar el banco a la cuenta, quedando así
         //
-        //public void addCuenta(Cuenta cuenta)
+        //public void addCuenta(C01_Cuenta cuenta)
         //{
         //      cuentas.add(cuenta);
         //      cuenta.setBanco(this); //Con esto a cada cuenta le asociamos este banco
@@ -291,7 +291,7 @@ class CuentaTest
         //Con esto ya funciona bien
         //
         //Este es precisamente un buen ejemplo de las pruebas unitarias, como 
-        //  se aprecia, parecia que esta bien el programa pues un Banco tenia bien
+        //  se aprecia, parecia que esta bien el programa pues un C01_Banco tenia bien
         //  sus referencias a cuentas, pero cuando se provo al reves (que una cuenta
         //  estuviera asociada a un banco) fue que dio error, ya con eso trabjamos
         //  en contrarrestar el error.
@@ -346,10 +346,10 @@ class CuentaTest
     @Test
     void testAssertionsAgrupadas()
     {
-        Cuenta cuenta1 = new Cuenta("Jhon Doe", new BigDecimal("2500"));
-        Cuenta cuenta2= new Cuenta("Andres", new BigDecimal("1500.8989"));
+        C01_Cuenta cuenta1 = new C01_Cuenta("Jhon Doe", new BigDecimal("2500"));
+        C01_Cuenta cuenta2= new C01_Cuenta("Andres", new BigDecimal("1500.8989"));
         
-        Banco banco= new Banco();
+        C01_Banco banco= new C01_Banco();
         banco.setNombre("Bital");
         
         banco.addCuenta(cuenta1);
@@ -402,7 +402,7 @@ class CuentaTest
     void testNombreCuentaConMensaje()
     {
         
-        Cuenta cuenta= new Cuenta("Andres", new BigDecimal("1000.12345"));  
+        C01_Cuenta cuenta= new C01_Cuenta("Andres", new BigDecimal("1000.12345"));  
         
         String esperado= "Andres";
         String real= cuenta.getPersona();
@@ -436,10 +436,10 @@ class CuentaTest
     @Test
     void testAssertionsAgrupadasConMensaje()
     {
-        Cuenta cuenta1 = new Cuenta("Jhon Doe", new BigDecimal("2500"));
-        Cuenta cuenta2= new Cuenta("Andres", new BigDecimal("1500.8989"));
+        C01_Cuenta cuenta1 = new C01_Cuenta("Jhon Doe", new BigDecimal("2500"));
+        C01_Cuenta cuenta2= new C01_Cuenta("Andres", new BigDecimal("1500.8989"));
         
-        Banco banco= new Banco();
+        C01_Banco banco= new C01_Banco();
         banco.setNombre("Bital");
         
         banco.addCuenta(cuenta1);
@@ -535,7 +535,7 @@ class CuentaTest
     {
         Assertions.fail(); ///****** fail fuerza que falle el test, no importa si la prueba esta bien, se fuerza su fallo.
                             //**** fail no es una etiqueta, esun método
-        Cuenta cuenta= new Cuenta("Andres", new BigDecimal("1000.12345"));  //se instancia un objeto de la clas a probar
+        C01_Cuenta cuenta= new C01_Cuenta("Andres", new BigDecimal("1000.12345"));  //se instancia un objeto de la clas a probar
         
         String esperado= "Andres";
         String real= cuenta.getPersona();
@@ -554,7 +554,7 @@ class CuentaTest
     void testAntesDeCada()
     {
         System.out.println("Iniciando prueba");
-        this.cuenta= new Cuenta("Andres", new BigDecimal("1000.12345"));  //se instancia un objeto de la clas a probar
+        this.cuenta= new C01_Cuenta("Andres", new BigDecimal("1000.12345"));  //se instancia un objeto de la clas a probar
     }
     
     @Test
@@ -720,7 +720,7 @@ class CuentaTest
     @Test
     void testAssumptionAssumingThat()
     {
-        cuenta.setBanco(new Banco());
+        cuenta.setBanco(new C01_Banco());
         cuenta.getBanco().setNombre("Bital");
         //establecimos el nombre del banco, esto es para la pruenba en caso de que se cumpla
         //el lenguaje
