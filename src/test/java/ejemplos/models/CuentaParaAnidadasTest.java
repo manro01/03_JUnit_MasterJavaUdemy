@@ -362,59 +362,7 @@ public class CuentaParaAnidadasTest
         }
     }
     
-/************************  TEST ANOTACIONES *************************************/
-    @Nested
-    class AnotacionesTest
-    {
 
-        @Test
-        @DisplayName("Probando testAnotaciones")
-        @Disabled //deshabilita la prueba, es como si se la saltara
-        void testAnotaciones()
-        {
-            fail(); ///****** fail fuerza que falle el test, no importa si la prueba esta bien, se fuerza su fallo.
-            //**** fail no es una etiqueta, esun método
-            //CuentaParaAnidadas cuenta= new Cuenta("Andres", new BigDecimal("1000.12345"));  //se instancia un objeto de la clas a probar
-
-            String esperado = "Andres";
-            String real = cuenta.getPersona();
-
-            assertEquals(esperado, real);
-            assertTrue(real.equals("Andres"));
-        }
-
-        //la tuive que pasar el inicio
-//        @Test
-//        @BeforeEach //Esto se ejecuta antes de cada método
-//        void testAntesDeCada()
-//        {
-//            System.out.println("Iniciando prueba");
-//            cuenta = new CuentaParaAnidadas("Andres", new BigDecimal("1000.12345"));  //se instancia un objeto de la clas a probar
-//        }
-
-        @Test
-        @AfterEach
-        void testDespuesDeCada()
-        {
-            System.out.println("Finalizando prueba");
-            System.out.println("");
-        }
-
-//        @Test
-//        @BeforeAll
-//        static void antesQueTodo()
-//        {
-//            System.out.println("Inicializando todas las ruebas");
-//        }
-
-//        @Test
-//        @AfterAll
-//        static void despuesDeTodo()
-//        {
-//            System.out.println("Finalizando todas las pruebas");
-//        }
-    }
-    
     
 /************************  TEST CONDICIONALES *************************************/
     @Nested
