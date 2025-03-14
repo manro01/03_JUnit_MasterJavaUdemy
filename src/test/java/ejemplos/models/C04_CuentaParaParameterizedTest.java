@@ -1,10 +1,19 @@
 /**
- * Se va a ejemplificar el uso de test con parámetros
+ * Se va a ejemplificar el uso de test con parámetros,
+ * En las pruebas parametizer podemos mandar parámetros para que sean usados por
+ *  el test. pueden ser valores o incluso archivos de texto plano.
+ * 
+ * NOTA: Por la incopatiblidad de netbean con junit5, algunas cosas NO funcionan
+ * probar con intelliJ, una se esas incompatibilidades es que cuando tengo innerClass
+ * los métodos que estan en la clase principal se le agruegan a los métodos del 
+ * la última innerClass, por eso las nuevas innerClass las voy poniendo en el 
+ * penúltimo lugar.
  */
 package ejemplos.models;
 
 import ejemplos.exceptions.DineroInsuficienteException;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Properties;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -32,8 +41,12 @@ import org.junit.jupiter.api.condition.EnabledOnJre;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.JRE;
 import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
-public class C04_CuentaParaParametizerTest
+public class C04_CuentaParaParameterizedTest
 {
     String nombreCuenta= "Andres"; //esta variable la agregue yo, por lo tanto cuando se use
     // es porque yo la integre al ejemplo, creo que no se debe usar porque es un valor
@@ -42,7 +55,7 @@ public class C04_CuentaParaParametizerTest
     
     //Este si lo puso el mestro y es correcto porque se inicializa para cada
     // prueba en la que se usa con el test @BeforeAll
-    C04_CuentaParaParametizer cuenta;
+    C04_CuentaParaParameterized cuenta;
     
     @Test
     @DisplayName("Probando testAnotaciones")
@@ -65,7 +78,7 @@ public class C04_CuentaParaParametizerTest
     void testAntesDeCada()
     {
         System.out.println("Iniciando prueba");
-        this.cuenta= new C04_CuentaParaParametizer("Andres", new BigDecimal("1000.12345"));  //se instancia un objeto de la clas a probar
+        this.cuenta= new C04_CuentaParaParameterized("Andres", new BigDecimal("1000.12345"));  //se instancia un objeto de la clas a probar
     }
     
     @Test
@@ -117,8 +130,8 @@ public class C04_CuentaParaParametizerTest
         @Test
         void testIgualdadCuenta()
         {
-            cuenta = new C04_CuentaParaParametizer("Jhon Doe", new BigDecimal("8900.997")); //valor real
-            C04_CuentaParaParametizer cuenta2 = new C04_CuentaParaParametizer("Jhon Doe", new BigDecimal("8900.997")); //valor esperado
+            cuenta = new C04_CuentaParaParameterized("Jhon Doe", new BigDecimal("8900.997")); //valor real
+            C04_CuentaParaParameterized cuenta2 = new C04_CuentaParaParameterized("Jhon Doe", new BigDecimal("8900.997")); //valor esperado
 
             assertEquals(cuenta, cuenta2);
         }
@@ -157,10 +170,10 @@ public class C04_CuentaParaParametizerTest
         @Test
         void testTransferirDineroCuentas()
         {
-            C04_CuentaParaParametizer cuenta1 = new C04_CuentaParaParametizer("Jhon Doe", new BigDecimal("2500"));
-            C04_CuentaParaParametizer cuenta2 = new C04_CuentaParaParametizer("Andres", new BigDecimal("1500.8989"));
+            C04_CuentaParaParameterized cuenta1 = new C04_CuentaParaParameterized("Jhon Doe", new BigDecimal("2500"));
+            C04_CuentaParaParameterized cuenta2 = new C04_CuentaParaParameterized("Andres", new BigDecimal("1500.8989"));
 
-            C04_BancoParaParametizer banco = new C04_BancoParaParametizer();
+            C04_BancoParaParameterized banco = new C04_BancoParaParameterized();
             banco.setNombre("Bital");
             banco.transferir(cuenta2, cuenta1, new BigDecimal(500));
 
@@ -171,10 +184,10 @@ public class C04_CuentaParaParametizerTest
         @Test
         void testRelacionBancoCuentas()
         {
-            C04_CuentaParaParametizer cuenta1 = new C04_CuentaParaParametizer("Jhon Doe", new BigDecimal("2500"));
-            C04_CuentaParaParametizer cuenta2 = new C04_CuentaParaParametizer("Andres", new BigDecimal("1500.8989"));
+            C04_CuentaParaParameterized cuenta1 = new C04_CuentaParaParameterized("Jhon Doe", new BigDecimal("2500"));
+            C04_CuentaParaParameterized cuenta2 = new C04_CuentaParaParameterized("Andres", new BigDecimal("1500.8989"));
 
-            C04_BancoParaParametizer banco = new C04_BancoParaParametizer();
+            C04_BancoParaParameterized banco = new C04_BancoParaParameterized();
             banco.addCuenta(cuenta1);
             banco.addCuenta(cuenta2);
 
@@ -208,10 +221,10 @@ public class C04_CuentaParaParametizerTest
         @Test
         void testAssertionsAgrupadas()
         {
-            C04_CuentaParaParametizer cuenta1 = new C04_CuentaParaParametizer("Jhon Doe", new BigDecimal("2500"));
-            C04_CuentaParaParametizer cuenta2 = new C04_CuentaParaParametizer("Andres", new BigDecimal("1500.8989"));
+            C04_CuentaParaParameterized cuenta1 = new C04_CuentaParaParameterized("Jhon Doe", new BigDecimal("2500"));
+            C04_CuentaParaParameterized cuenta2 = new C04_CuentaParaParameterized("Andres", new BigDecimal("1500.8989"));
 
-            C04_BancoParaParametizer banco = new C04_BancoParaParametizer();
+            C04_BancoParaParameterized banco = new C04_BancoParaParameterized();
             banco.setNombre("Bital");
 
             banco.addCuenta(cuenta1);
@@ -273,10 +286,10 @@ public class C04_CuentaParaParametizerTest
         @Test
         void testAssertionsAgrupadasConMensaje()
         {
-            C04_CuentaParaParametizer cuenta1 = new C04_CuentaParaParametizer("Jhon Doe", new BigDecimal("2500"));
-            C04_CuentaParaParametizer cuenta2 = new C04_CuentaParaParametizer("Andres", new BigDecimal("1500.8989"));
+            C04_CuentaParaParameterized cuenta1 = new C04_CuentaParaParameterized("Jhon Doe", new BigDecimal("2500"));
+            C04_CuentaParaParameterized cuenta2 = new C04_CuentaParaParameterized("Andres", new BigDecimal("1500.8989"));
 
-            C04_BancoParaParametizer banco = new C04_BancoParaParametizer();
+            C04_BancoParaParameterized banco = new C04_BancoParaParameterized();
             banco.setNombre("Bital");
 
             banco.addCuenta(cuenta1);
@@ -455,9 +468,86 @@ public class C04_CuentaParaParametizerTest
     }
     
     
+    /************************  TEST ASSUMPTION (SUPOSICIONES)*************************************/
     
-    
-    
+    /**
+     * Con las pruebas Paameterized, podemos hacer pruebas mandando arguementos.
+     * @ParameterizedTest para indicar que va a ser un test Parameterized
+     * @ValueSource(strings= {"100", "200", "300", "500", "700", "1000"})
+     *  ValuesSource es un tipo de source (fuente) a usasr existen otros más 
+     *      que se pueden usar https://junit.org/junit5/docs/5.0.3/api/org/junit/jupiter/params/provider/package-summary.html
+     *  en el lcao de ValueSource se le va a pasar un arreglo de valores, todos 
+     *      deben ser del mismo tipo, y por cada valor se le hara una prueba
+     *  antes del arreglo se coloca el tipo de arreglo ( strings, ints, longs, doubles ).
+     * 
+     * A @ParameterizedTest tambien se le pueden pasar argumentos, por ejemplo
+     *  @ParameterizedTest(name= "nombre que va a aparece en cada prueba") se pueden
+     *      usar variables en el nombre
+     *                      {index}: the current invocation index (1-based)
+     *                      {arguments}: the complete, comma-separated arguments list
+     *                      {0}, {1}, etc.: an individual argument
+     * 
+     * NOTA: los nombres NO funcionan en Netbeans
+
+     */
+    @Nested
+    class ParameterizedTestClass
+    {
+        @ParameterizedTest
+        @ValueSource(strings= {"100", "200", "300", "500", "700", "1000"})
+        void testDebitoCuenta(String monto)
+        {
+            cuenta.debito(new BigDecimal(monto));
+            assertNotNull(cuenta.getSaldo()); //primeo se verifica que el saldo de la cuenta no sea null (aunque esta revisión no sea explícita se hace en la linea de abajo pues no serían igual los valores)
+            assertTrue(cuenta.getSaldo().compareTo(BigDecimal.ZERO)>0); 
+        }
+        
+        @ParameterizedTest(name= "numero {index} ejecutando con valor {0} - {argumentsWithNames}")
+        @ValueSource(strings= {"100", "200", "300", "500", "700", "1000"})
+        void testParameterizedConNombre(String monto)
+        {
+            cuenta.debito(new BigDecimal(monto));
+            assertNotNull(cuenta.getSaldo()); //primeo se verifica que el saldo de la cuenta no sea null (aunque esta revisión no sea explícita se hace en la linea de abajo pues no serían igual los valores)
+            assertTrue(cuenta.getSaldo().compareTo(BigDecimal.ZERO)>0); 
+        }
+        
+        @ParameterizedTest(name= "numero {index} ejecutando con valor {argumentsWithNames}")
+        @CsvSource({"1,100", "2,200", "3,300", "4,500", "5,700", "6,1000"})
+            //Recuerda que los CVS son arreeglo donde hay un indice y un valor
+        void testParameterizedConCvsSource(String indice, String monto)
+        {
+            cuenta.debito(new BigDecimal(monto));
+            assertNotNull(cuenta.getSaldo());
+            assertTrue(cuenta.getSaldo().compareTo(BigDecimal.ZERO)>0);
+        }
+
+        @ParameterizedTest(name= "numero {index} ejecutando con valor {argumentsWithNames}")
+        @CsvFileSource(resources = "/data.csv")
+        void testParameterizedConCvsFile(String monto)//a diferencia de @CsvSource el archivo csv, solo tiene los valores no el indice por lo que, únicamente se necesita un parrametro en este caso monto del tipo String
+        {
+            cuenta.debito(new BigDecimal(monto));
+            assertNotNull(cuenta.getSaldo());
+            assertTrue(cuenta.getSaldo().compareTo(BigDecimal.ZERO)>0);
+        }
+
+        //@ParameterizedTest(name= "numero {index} ejecutando con valor {argumentsWithNames}")
+        //@MethodSource("montoList") //solo se pone el nombre del método
+        //void testParameterizedMethodSource(String monto)
+        //{
+            //cuenta.debito(new BigDecimal(monto));
+            //assertNotNull(cuenta.getSaldo());
+            //assertTrue(cuenta.getSaldo().compareTo(BigDecimal.ZERO)>0);
+        //}
+
+        //Es de ayuda para testParameterizedMethodSource, solo regresa los valores para las pruebas
+        //TIENE QUE SER STATIC
+        //NOTA: PARA QUE FUNCIONE se tiene que estar en la version 16 o mayor de java porque las anterires, NO
+        // dejaban que hubieran funciones static en las innerclass
+        //static List<String> montoList()
+        //{
+        //    return Arrays.asList("100", "200", "300", "500", "700", "1000");
+        //}
+    }
     
 /************************  TEST ASSUMPTION (SUPOSICIONES)*************************************/
     @Nested
@@ -483,7 +573,7 @@ public class C04_CuentaParaParametizerTest
         @Test
         void testAssumptionAssumingThat()
         {
-            cuenta.setBanco(new C04_BancoParaParametizer());
+            cuenta.setBanco(new C04_BancoParaParameterized());
             cuenta.getBanco().setNombre("Bital");
             System.out.println("(assumingThat)Esta prueba se hara completa solo si la property user.language = en");
 

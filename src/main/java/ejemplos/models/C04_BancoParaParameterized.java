@@ -7,12 +7,12 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class C04_BancoParaParametizer
+public class C04_BancoParaParameterized
 {
     private String nombre;
-    private List<C04_CuentaParaParametizer> cuentas;
+    private List<C04_CuentaParaParameterized> cuentas;
     
-    public C04_BancoParaParametizer()
+    public C04_BancoParaParameterized()
     {
         cuentas= new ArrayList<>();
     }
@@ -27,23 +27,23 @@ public class C04_BancoParaParametizer
         this.nombre = nombre;
     }
 
-    public List<C04_CuentaParaParametizer> getCuentas()
+    public List<C04_CuentaParaParameterized> getCuentas()
     {
         return cuentas;
     }
 
-    public void setCuentas(List<C04_CuentaParaParametizer> cuentas)
+    public void setCuentas(List<C04_CuentaParaParameterized> cuentas)
     {
         this.cuentas = cuentas;
     }
     
-    public void addCuenta(C04_CuentaParaParametizer cuenta)
+    public void addCuenta(C04_CuentaParaParameterized cuenta)
     {
         cuentas.add(cuenta);
         cuenta.setBanco(this); //Con esto a cada cuenta le asociamos este banco
     }
     
-    public void transferir(C04_CuentaParaParametizer origen, C04_CuentaParaParametizer destino, BigDecimal monto)
+    public void transferir(C04_CuentaParaParameterized origen, C04_CuentaParaParameterized destino, BigDecimal monto)
     {
         origen.debito(monto); //saca el dinero de la cuenta origen
         destino.credito(monto); //guarda el dinero en la cuenta destino

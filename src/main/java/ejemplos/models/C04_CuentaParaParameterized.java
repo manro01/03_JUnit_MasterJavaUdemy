@@ -8,19 +8,19 @@ import ejemplos.exceptions.DineroInsuficienteException;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public class C04_CuentaParaParametizer
+public class C04_CuentaParaParameterized
 {
     private String persona;
     private BigDecimal saldo;
     
-    private C04_BancoParaParametizer banco;
+    private C04_BancoParaParameterized banco;
 
     public String getPersona()
     {
         return persona;
     }
 
-    public C04_CuentaParaParametizer(String persona, BigDecimal saldo)
+    public C04_CuentaParaParameterized(String persona, BigDecimal saldo)
     {
         this.saldo = saldo;
         this.persona= persona;
@@ -43,12 +43,12 @@ public class C04_CuentaParaParametizer
         this.saldo = saldo;
     }
 
-    public C04_BancoParaParametizer getBanco()
+    public C04_BancoParaParameterized getBanco()
     {
         return banco;
     }
 
-    public void setBanco(C04_BancoParaParametizer banco)
+    public void setBanco(C04_BancoParaParameterized banco)
     {
         this.banco = banco;
     }
@@ -91,7 +91,7 @@ public class C04_CuentaParaParametizer
         if (getClass() != obj.getClass()) { //revisa que los objetos sean de la misma clase
             return false;
         }
-        final C04_CuentaParaParametizer other = (C04_CuentaParaParametizer) obj; //crea un objeto nuevo con lo mandado por parámetro
+        final C04_CuentaParaParameterized other = (C04_CuentaParaParameterized) obj; //crea un objeto nuevo con lo mandado por parámetro
         if (!Objects.equals(this.persona, other.persona)) { //verifica si el valor persona es el mismo
             return false;
         }
