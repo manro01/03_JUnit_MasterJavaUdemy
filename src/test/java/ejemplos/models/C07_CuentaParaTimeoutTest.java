@@ -16,6 +16,11 @@
  *      Y executable es un objeto tipo Executable como una funcion flecha
  *      POR EJEMPLO
  *              Assertions.assertTimeout(Duration.ofSeconds(5), ()->{});
+ * 
+ * NOTA MUY MUY IMPORTANTE: Cuando se usan ANOTACIONES para el timeout, en caso
+ *  de que falle la prueba por el timeout, se tomo como ERROR y no termina la ejecución
+ *  del programa, pero si se usa el assert si termina la ejecución. 
+ *      Por lo menos así funciona en netbeans
  *
  * NOTA: Por la incopatiblidad de netbean con junit5, algunas cosas NO funcionan
  * probar con intelliJ, una se esas incompatibilidades es que cuando tengo innerClass
