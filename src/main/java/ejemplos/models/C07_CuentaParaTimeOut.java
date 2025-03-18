@@ -1,6 +1,6 @@
 /*
  * Esta es la clase cuenta para probar las test con Inyección de Dependencias, 
- * Es lo mismo que estaba en C06_CuentaParaInyeccionDependencias
+ * Es lo mismo que estaba en C06_CuentaParaInyeccionDependencias.
  */
 package ejemplos.models;
 
