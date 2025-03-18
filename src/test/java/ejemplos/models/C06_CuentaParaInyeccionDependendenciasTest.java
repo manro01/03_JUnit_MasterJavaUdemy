@@ -1,8 +1,11 @@
 /**
- * Se va a ejemplificar el uso de test con parámetros,
- * En las pruebas parametizer podemos mandar parámetros para que sean usados por
- *  el test. pueden ser valores o incluso archivos de texto plano.
- * 
+ * Se va a ejemplificar el uso de test con Inyección de Dependencias
+ * Se van a inyectar dos dependencias son muy útiles para hacer los reportes
+ * TestInfo y TestReporter
+ * TestInfo contiene mucha información de los test, como su nombre, tags, clases, etc
+ * TestReporter es para hacer un log de las pruebas. entonces en la panta de ouput se va a poner
+ *  más información como por ejemplo fecha
+ *
  * NOTA: Por la incopatiblidad de netbean con junit5, algunas cosas NO funcionan
  * probar con intelliJ, una se esas incompatibilidades es que cuando tengo innerClass
  * los métodos que estan en la clase principal se le agruegan a los métodos del 
@@ -16,9 +19,9 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
+
+import org.junit.jupiter.api.*;
+
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -28,14 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.Assumptions.assumingThat;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.RepetitionInfo;
-import org.junit.jupiter.api.Test;
+
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.junit.jupiter.api.condition.EnabledOnJre;
@@ -48,7 +44,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-public class C04_CuentaParaParameterizedTest
+public class C06_CuentaParaInyeccionDependendenciasTest
 {
     String nombreCuenta= "Andres"; //esta variable la agregue yo, por lo tanto cuando se use
     // es porque yo la integre al ejemplo, creo que no se debe usar porque es un valor
@@ -57,7 +53,12 @@ public class C04_CuentaParaParameterizedTest
     
     //Este si lo puso el mestro y es correcto porque se inicializa para cada
     // prueba en la que se usa con el test @BeforeAll
-    C04_CuentaParaParameterized cuenta;
+    C06_CuentaParaInyeccionDependencias cuenta;
+
+    //Al igual que otras variables, estos objetos se pueden poner como variables globales o como
+    //parámetos de método por ejemplo [ void testAnotaciones(TestInfo testInfo, TestReporter testReporter) ]
+    private TestInfo testInfo;
+    private TestReporter testReporter;
     
     @Test
     @DisplayName("Probando testAnotaciones")
@@ -77,10 +78,27 @@ public class C04_CuentaParaParameterizedTest
     
     @Test
     @BeforeEach //Esto se ejecuta antes de cada método
-    void testAntesDeCada()
+    void testAntesDeCada(TestInfo testInfo, TestReporter testReporter)
     {
-        System.out.println("Iniciando prueba");
-        this.cuenta= new C04_CuentaParaParameterized("Andres", new BigDecimal("1000.12345"));  //se instancia un objeto de la clas a probar
+        this.testInfo= testInfo;
+        this.testReporter= testReporter;
+
+        //Con esto mejoramos la presentación pues ahora, antes de cada Prueba se va a poner esta información
+        System.out.println(" Iniciando prueba: " + testInfo.getDisplayName() + " " + testInfo.getTestMethod().get().getName());
+
+        if(testInfo.getTags().isEmpty()==false)
+        {
+            System.out.println("Tiene las etiquetas: " + testInfo.getTags().toString());
+        }
+
+        testReporter.publishEntry(" Iniciando prueba: " + testInfo.getDisplayName() + " " + testInfo.getTestMethod().get().getName());
+
+        if(testInfo.getTags().isEmpty()==false)
+        {
+            testReporter.publishEntry("Tiene las etiquetas: " + testInfo.getTags().toString());
+        }
+
+        this.cuenta= new C06_CuentaParaInyeccionDependencias("Andres", new BigDecimal("1000.12345"));  //se instancia un objeto de la clas a probar
     }
     
     @Test
@@ -111,9 +129,12 @@ public class C04_CuentaParaParameterizedTest
     class SimplesTest
     {
 
-        @Test ///Es para indicar que va a ser un métopo para las pruebas
+        @Tag("simples")
+        @DisplayName("Prueba Nombre Cuenta")
+        @Test ///Es para indicar que va a ser un método para las pruebas
         void testNombreCuenta()
         {
+
             String esperado = "Andres";
             String real = cuenta.getPersona();
 
@@ -121,6 +142,7 @@ public class C04_CuentaParaParameterizedTest
             assertTrue(real.equals("Andres"));
         }
 
+        @Tag("simples")
         @Test
         void testSaldoCuenta()
         {
@@ -129,11 +151,12 @@ public class C04_CuentaParaParameterizedTest
             assertFalse(cuenta.getSaldo().compareTo(BigDecimal.ZERO) < 0);
         }
 
+        @Tag("simples")
         @Test
         void testIgualdadCuenta()
         {
-            cuenta = new C04_CuentaParaParameterized("Jhon Doe", new BigDecimal("8900.997")); //valor real
-            C04_CuentaParaParameterized cuenta2 = new C04_CuentaParaParameterized("Jhon Doe", new BigDecimal("8900.997")); //valor esperado
+            cuenta = new C06_CuentaParaInyeccionDependencias("Jhon Doe", new BigDecimal("8900.997")); //valor real
+            C06_CuentaParaInyeccionDependencias cuenta2 = new C06_CuentaParaInyeccionDependencias("Jhon Doe", new BigDecimal("8900.997")); //valor esperado
 
             assertEquals(cuenta, cuenta2);
         }
@@ -172,10 +195,10 @@ public class C04_CuentaParaParameterizedTest
         @Test
         void testTransferirDineroCuentas()
         {
-            C04_CuentaParaParameterized cuenta1 = new C04_CuentaParaParameterized("Jhon Doe", new BigDecimal("2500"));
-            C04_CuentaParaParameterized cuenta2 = new C04_CuentaParaParameterized("Andres", new BigDecimal("1500.8989"));
+            C06_CuentaParaInyeccionDependencias cuenta1 = new C06_CuentaParaInyeccionDependencias("Jhon Doe", new BigDecimal("2500"));
+            C06_CuentaParaInyeccionDependencias cuenta2 = new C06_CuentaParaInyeccionDependencias("Andres", new BigDecimal("1500.8989"));
 
-            C04_BancoParaParameterized banco = new C04_BancoParaParameterized();
+            C06_BancoParaInyeccionDependencias banco = new C06_BancoParaInyeccionDependencias();
             banco.setNombre("Bital");
             banco.transferir(cuenta2, cuenta1, new BigDecimal(500));
 
@@ -183,13 +206,14 @@ public class C04_CuentaParaParameterizedTest
             assertEquals("3000", cuenta1.getSaldo().toPlainString());
         }
 
+        @Tag("simples")
         @Test
         void testRelacionBancoCuentas()
         {
-            C04_CuentaParaParameterized cuenta1 = new C04_CuentaParaParameterized("Jhon Doe", new BigDecimal("2500"));
-            C04_CuentaParaParameterized cuenta2 = new C04_CuentaParaParameterized("Andres", new BigDecimal("1500.8989"));
+            C06_CuentaParaInyeccionDependencias cuenta1 = new C06_CuentaParaInyeccionDependencias("Jhon Doe", new BigDecimal("2500"));
+            C06_CuentaParaInyeccionDependencias cuenta2 = new C06_CuentaParaInyeccionDependencias("Andres", new BigDecimal("1500.8989"));
 
-            C04_BancoParaParameterized banco = new C04_BancoParaParameterized();
+            C06_BancoParaInyeccionDependencias banco = new C06_BancoParaInyeccionDependencias();
             banco.addCuenta(cuenta1);
             banco.addCuenta(cuenta2);
 
@@ -223,10 +247,10 @@ public class C04_CuentaParaParameterizedTest
         @Test
         void testAssertionsAgrupadas()
         {
-            C04_CuentaParaParameterized cuenta1 = new C04_CuentaParaParameterized("Jhon Doe", new BigDecimal("2500"));
-            C04_CuentaParaParameterized cuenta2 = new C04_CuentaParaParameterized("Andres", new BigDecimal("1500.8989"));
+            C06_CuentaParaInyeccionDependencias cuenta1 = new C06_CuentaParaInyeccionDependencias("Jhon Doe", new BigDecimal("2500"));
+            C06_CuentaParaInyeccionDependencias cuenta2 = new C06_CuentaParaInyeccionDependencias("Andres", new BigDecimal("1500.8989"));
 
-            C04_BancoParaParameterized banco = new C04_BancoParaParameterized();
+            C06_BancoParaInyeccionDependencias banco = new C06_BancoParaInyeccionDependencias();
             banco.setNombre("Bital");
 
             banco.addCuenta(cuenta1);
@@ -273,6 +297,7 @@ public class C04_CuentaParaParameterizedTest
     class MensajesTest
     {
 
+        @Tag("simples")
         @Test
         void testNombreCuentaConMensaje()
         {
@@ -288,10 +313,10 @@ public class C04_CuentaParaParameterizedTest
         @Test
         void testAssertionsAgrupadasConMensaje()
         {
-            C04_CuentaParaParameterized cuenta1 = new C04_CuentaParaParameterized("Jhon Doe", new BigDecimal("2500"));
-            C04_CuentaParaParameterized cuenta2 = new C04_CuentaParaParameterized("Andres", new BigDecimal("1500.8989"));
+            C06_CuentaParaInyeccionDependencias cuenta1 = new C06_CuentaParaInyeccionDependencias("Jhon Doe", new BigDecimal("2500"));
+            C06_CuentaParaInyeccionDependencias cuenta2 = new C06_CuentaParaInyeccionDependencias("Andres", new BigDecimal("1500.8989"));
 
-            C04_BancoParaParameterized banco = new C04_BancoParaParameterized();
+            C06_BancoParaInyeccionDependencias banco = new C06_BancoParaInyeccionDependencias();
             banco.setNombre("Bital");
 
             banco.addCuenta(cuenta1);
@@ -492,6 +517,7 @@ public class C04_CuentaParaParameterizedTest
      * NOTA: los nombres NO funcionan en Netbeans
 
      */
+    @Tag("param") //todas las test de la innerClass ParameterizedTestClass ahora tiene la etiqueta param
     @Nested
     class ParameterizedTestClass
     {
@@ -627,7 +653,7 @@ public class C04_CuentaParaParameterizedTest
         @Test
         void testAssumptionAssumingThat()
         {
-            cuenta.setBanco(new C04_BancoParaParameterized());
+            cuenta.setBanco(new C06_BancoParaInyeccionDependencias());
             cuenta.getBanco().setNombre("Bital");
             System.out.println("(assumingThat)Esta prueba se hara completa solo si la property user.language = en");
 

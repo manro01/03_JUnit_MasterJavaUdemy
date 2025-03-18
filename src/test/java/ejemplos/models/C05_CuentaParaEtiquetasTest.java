@@ -1,8 +1,19 @@
 /**
- * Se va a ejemplificar el uso de test con parámetros,
- * En las pruebas parametizer podemos mandar parámetros para que sean usados por
- *  el test. pueden ser valores o incluso archivos de texto plano.
- * 
+ * Se va a ejemplificar el uso de test con Etiquetas
+ * Las etiquetas sirven para "unir" varias pruebas y así podemos indicar que solo las
+ * pruebas de una etiqueta se ejecuten, aunque esten en diferentes innerClass, son
+ * como los tag de los foros.
+ *
+ * Se pude etiquetar toda la innerClass(con lo que todas las test dentro de esa innerClass llevan la etiqueta)
+ * o se puede etiquetar test por test (una por una)
+ *
+ * Para ejecutar las pruebas por etiquetas, es el IDE por ejemplo para IntelliJ es donde esta el nombre de la clase
+ *  de test (entre el martillo verde y el botón de play verde), click ahí luego en "Edit Configuration", en la ventana
+ *  que se abre, abajo de donde esta la versión de java, esta el despleglabe que dice Class, es donde se elige como se van
+ *  a hacer las pruebas por lo que hay que elegir Tags, en el cuadro siguiente poner el nombre de la etiqueta, ok y ya en el
+ *  IDE hay que darle en el botón play verde, para que se ejecute la prueba de tags
+ *      Para dos o mas etiquetas hacer lo mismo pero las etiquetas se separan por |
+ *
  * NOTA: Por la incopatiblidad de netbean con junit5, algunas cosas NO funcionan
  * probar con intelliJ, una se esas incompatibilidades es que cuando tengo innerClass
  * los métodos que estan en la clase principal se le agruegan a los métodos del 
@@ -16,9 +27,9 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
+
+import org.junit.jupiter.api.*;
+
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -28,14 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.Assumptions.assumingThat;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.RepetitionInfo;
-import org.junit.jupiter.api.Test;
+
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.junit.jupiter.api.condition.EnabledOnJre;
@@ -48,7 +52,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-public class C04_CuentaParaParameterizedTest
+public class C05_CuentaParaEtiquetasTest
 {
     String nombreCuenta= "Andres"; //esta variable la agregue yo, por lo tanto cuando se use
     // es porque yo la integre al ejemplo, creo que no se debe usar porque es un valor
@@ -57,7 +61,7 @@ public class C04_CuentaParaParameterizedTest
     
     //Este si lo puso el mestro y es correcto porque se inicializa para cada
     // prueba en la que se usa con el test @BeforeAll
-    C04_CuentaParaParameterized cuenta;
+    C05_CuentaParaEtiquetas cuenta;
     
     @Test
     @DisplayName("Probando testAnotaciones")
@@ -80,7 +84,7 @@ public class C04_CuentaParaParameterizedTest
     void testAntesDeCada()
     {
         System.out.println("Iniciando prueba");
-        this.cuenta= new C04_CuentaParaParameterized("Andres", new BigDecimal("1000.12345"));  //se instancia un objeto de la clas a probar
+        this.cuenta= new C05_CuentaParaEtiquetas("Andres", new BigDecimal("1000.12345"));  //se instancia un objeto de la clas a probar
     }
     
     @Test
@@ -111,7 +115,8 @@ public class C04_CuentaParaParameterizedTest
     class SimplesTest
     {
 
-        @Test ///Es para indicar que va a ser un métopo para las pruebas
+        @Tag("simples")
+        @Test ///Es para indicar que va a ser un método para las pruebas
         void testNombreCuenta()
         {
             String esperado = "Andres";
@@ -121,6 +126,7 @@ public class C04_CuentaParaParameterizedTest
             assertTrue(real.equals("Andres"));
         }
 
+        @Tag("simples")
         @Test
         void testSaldoCuenta()
         {
@@ -129,11 +135,12 @@ public class C04_CuentaParaParameterizedTest
             assertFalse(cuenta.getSaldo().compareTo(BigDecimal.ZERO) < 0);
         }
 
+        @Tag("simples")
         @Test
         void testIgualdadCuenta()
         {
-            cuenta = new C04_CuentaParaParameterized("Jhon Doe", new BigDecimal("8900.997")); //valor real
-            C04_CuentaParaParameterized cuenta2 = new C04_CuentaParaParameterized("Jhon Doe", new BigDecimal("8900.997")); //valor esperado
+            cuenta = new C05_CuentaParaEtiquetas("Jhon Doe", new BigDecimal("8900.997")); //valor real
+            C05_CuentaParaEtiquetas cuenta2 = new C05_CuentaParaEtiquetas("Jhon Doe", new BigDecimal("8900.997")); //valor esperado
 
             assertEquals(cuenta, cuenta2);
         }
@@ -172,10 +179,10 @@ public class C04_CuentaParaParameterizedTest
         @Test
         void testTransferirDineroCuentas()
         {
-            C04_CuentaParaParameterized cuenta1 = new C04_CuentaParaParameterized("Jhon Doe", new BigDecimal("2500"));
-            C04_CuentaParaParameterized cuenta2 = new C04_CuentaParaParameterized("Andres", new BigDecimal("1500.8989"));
+            C05_CuentaParaEtiquetas cuenta1 = new C05_CuentaParaEtiquetas("Jhon Doe", new BigDecimal("2500"));
+            C05_CuentaParaEtiquetas cuenta2 = new C05_CuentaParaEtiquetas("Andres", new BigDecimal("1500.8989"));
 
-            C04_BancoParaParameterized banco = new C04_BancoParaParameterized();
+            C05_BancoParaEtiquetas banco = new C05_BancoParaEtiquetas();
             banco.setNombre("Bital");
             banco.transferir(cuenta2, cuenta1, new BigDecimal(500));
 
@@ -183,13 +190,14 @@ public class C04_CuentaParaParameterizedTest
             assertEquals("3000", cuenta1.getSaldo().toPlainString());
         }
 
+        @Tag("simples")
         @Test
         void testRelacionBancoCuentas()
         {
-            C04_CuentaParaParameterized cuenta1 = new C04_CuentaParaParameterized("Jhon Doe", new BigDecimal("2500"));
-            C04_CuentaParaParameterized cuenta2 = new C04_CuentaParaParameterized("Andres", new BigDecimal("1500.8989"));
+            C05_CuentaParaEtiquetas cuenta1 = new C05_CuentaParaEtiquetas("Jhon Doe", new BigDecimal("2500"));
+            C05_CuentaParaEtiquetas cuenta2 = new C05_CuentaParaEtiquetas("Andres", new BigDecimal("1500.8989"));
 
-            C04_BancoParaParameterized banco = new C04_BancoParaParameterized();
+            C05_BancoParaEtiquetas banco = new C05_BancoParaEtiquetas();
             banco.addCuenta(cuenta1);
             banco.addCuenta(cuenta2);
 
@@ -223,10 +231,10 @@ public class C04_CuentaParaParameterizedTest
         @Test
         void testAssertionsAgrupadas()
         {
-            C04_CuentaParaParameterized cuenta1 = new C04_CuentaParaParameterized("Jhon Doe", new BigDecimal("2500"));
-            C04_CuentaParaParameterized cuenta2 = new C04_CuentaParaParameterized("Andres", new BigDecimal("1500.8989"));
+            C05_CuentaParaEtiquetas cuenta1 = new C05_CuentaParaEtiquetas("Jhon Doe", new BigDecimal("2500"));
+            C05_CuentaParaEtiquetas cuenta2 = new C05_CuentaParaEtiquetas("Andres", new BigDecimal("1500.8989"));
 
-            C04_BancoParaParameterized banco = new C04_BancoParaParameterized();
+            C05_BancoParaEtiquetas banco = new C05_BancoParaEtiquetas();
             banco.setNombre("Bital");
 
             banco.addCuenta(cuenta1);
@@ -273,6 +281,7 @@ public class C04_CuentaParaParameterizedTest
     class MensajesTest
     {
 
+        @Tag("simples")
         @Test
         void testNombreCuentaConMensaje()
         {
@@ -288,10 +297,10 @@ public class C04_CuentaParaParameterizedTest
         @Test
         void testAssertionsAgrupadasConMensaje()
         {
-            C04_CuentaParaParameterized cuenta1 = new C04_CuentaParaParameterized("Jhon Doe", new BigDecimal("2500"));
-            C04_CuentaParaParameterized cuenta2 = new C04_CuentaParaParameterized("Andres", new BigDecimal("1500.8989"));
+            C05_CuentaParaEtiquetas cuenta1 = new C05_CuentaParaEtiquetas("Jhon Doe", new BigDecimal("2500"));
+            C05_CuentaParaEtiquetas cuenta2 = new C05_CuentaParaEtiquetas("Andres", new BigDecimal("1500.8989"));
 
-            C04_BancoParaParameterized banco = new C04_BancoParaParameterized();
+            C05_BancoParaEtiquetas banco = new C05_BancoParaEtiquetas();
             banco.setNombre("Bital");
 
             banco.addCuenta(cuenta1);
@@ -492,6 +501,7 @@ public class C04_CuentaParaParameterizedTest
      * NOTA: los nombres NO funcionan en Netbeans
 
      */
+    @Tag("param") //todas las test de la innerClass ParameterizedTestClass ahora tiene la etiqueta param
     @Nested
     class ParameterizedTestClass
     {
@@ -627,7 +637,7 @@ public class C04_CuentaParaParameterizedTest
         @Test
         void testAssumptionAssumingThat()
         {
-            cuenta.setBanco(new C04_BancoParaParameterized());
+            cuenta.setBanco(new C05_BancoParaEtiquetas());
             cuenta.getBanco().setNombre("Bital");
             System.out.println("(assumingThat)Esta prueba se hara completa solo si la property user.language = en");
 
